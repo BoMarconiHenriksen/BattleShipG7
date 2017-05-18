@@ -19,7 +19,7 @@ import java.util.Random;
  */
 public class Player implements BattleshipsPlayer {
     
-    private boolean DEBUG = true;
+    private final boolean DEBUG = true;
     private final static Random rnd = new Random();
     private int sizeX;
     private int sizeY;
@@ -44,7 +44,10 @@ public class Player implements BattleshipsPlayer {
         sizeX = board.sizeX();
         sizeY = board.sizeY();
         boardTest = new int[sizeY][sizeX];
-
+        hitmap = new int[sizeY][sizeX];
+        hitmapLige = new ArrayList<>();
+        hitmapUlige = new ArrayList<>();
+        
         for (int y = 0; y < sizeY; y++) {
             for (int x = 0; x < sizeX; x++) {
                 boardTest[y][x] = 0; // Empty position
@@ -73,7 +76,7 @@ public class Player implements BattleshipsPlayer {
             }
 
         }
-        if(DEBUG == true){
+        if(DEBUG == true){ // SHOWS PLACEMENT MAP FOR SHIPS
         for (int r = boardTest.length-1; r>=0; r--) {
             System.out.println("");
             for (int c = 0; c < boardTest[0].length ;c++) {
@@ -168,7 +171,7 @@ public class Player implements BattleshipsPlayer {
         
         
         
-        //Print
+        //Print 
         for (int r = 0; r < boardTest.length; r++) {
             System.out.println("");
             for (int c = 0; c < boardTest[0].length; c++) {
