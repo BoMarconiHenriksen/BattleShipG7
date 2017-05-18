@@ -29,7 +29,7 @@ public class G7 implements PlayerFactory<BattleshipsPlayer>{
 
     @Override
     public String getName() {
-        return "Stanislav";
+        return "Bo & Stanislav";
     }
 
     @Override
