@@ -136,7 +136,11 @@ public class Player implements BattleshipsPlayer {
 
     @Override
     public Position getFireCoordinates(Fleet enemyShips) {
-
+        
+        //Random lige shot
+        
+        
+        
         Position shot;
         int x = rnd.nextInt(sizeX);
         int y = rnd.nextInt(sizeY);
