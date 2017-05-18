@@ -23,6 +23,10 @@ public class Player implements BattleshipsPlayer {
     private int sizeX;
     private int sizeY;
     private int[][] boardTest;
+    private int[][] hitmap;
+    private ArrayList<Position> hitmapLige;
+    private ArrayList<Position> hitmapUlige;
+    
 
     @Override
     public void startMatch(int rounds, Fleet ships, int sizeX, int sizeY) {
@@ -136,6 +140,39 @@ public class Player implements BattleshipsPlayer {
         shot = new Position(x, y);
         
         return shot;
+    }
+    
+    public int[][] fillArray() {
+        
+        Position pos;
+        
+        //Udfylder map med 1 og 2 taller
+        for (int x = 0; x < sizeX; x++ ) {
+            
+            for (int y = 0; y < sizeY; y++) {
+                if(y % 2 == 0 && x % 2 > 0 || x % 2 == 0 && y % 2 > 0){
+                hitmap[x][y] = 0; // nummer for hvert felt
+                pos = new Position(x, y);
+                hitmapLige.add(pos);
+                } else {
+                    hitmap[x][y] = 1;
+                    pos = new Position(x, y);
+                    hitmapUlige.add(pos);
+                }
+                
+            }
+        }
+        
+        
+        
+        //Print
+        for (int r = 0; r < boardTest.length; r++) {
+            System.out.println("");
+            for (int c = 0; c < boardTest[0].length; c++) {
+                System.out.print(" " + hitmap[r][c]);
+            }
+        }
+        return hitmap;
     }
 
     @Override
