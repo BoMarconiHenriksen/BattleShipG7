@@ -18,7 +18,8 @@ import java.util.Random;
  * @author Stanislav
  */
 public class Player implements BattleshipsPlayer {
-
+    
+    private boolean DEBUG = true;
     private final static Random rnd = new Random();
     private int sizeX;
     private int sizeY;
@@ -72,6 +73,7 @@ public class Player implements BattleshipsPlayer {
             }
 
         }
+        if(DEBUG == true){
         for (int r = boardTest.length-1; r>=0; r--) {
             System.out.println("");
             for (int c = 0; c < boardTest[0].length ;c++) {
@@ -79,6 +81,7 @@ public class Player implements BattleshipsPlayer {
             }
         }
         System.out.println("");
+        }
     }
 
 //places the passed ship on the board starting at position (x,y) and going towards the passed direction
