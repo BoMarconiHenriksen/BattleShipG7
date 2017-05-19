@@ -85,7 +85,6 @@ public class Player implements BattleshipsPlayer {
         }
         System.out.println("");
         }
-        fleet.getShip(i).size()
     }
 
 //places the passed ship on the board starting at position (x,y) and going towards the passed direction
