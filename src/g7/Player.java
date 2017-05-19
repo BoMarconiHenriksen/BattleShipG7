@@ -145,7 +145,7 @@ public class Player implements BattleshipsPlayer {
           //  while (validShot = false) {
                 int x = rnd.nextInt(sizeX);
                 int y = rnd.nextInt(sizeY);
-                shot = new Position(x, y);
+                shot = new Position(x, y); // midlertidig random shooter skal fjernes igen.
                 // Checker om tallene er rigtige iforhold til Statistisk Parity meteode for skydning
 //
 //                if (x % 2 == 0 && y % 2 != 0) {
@@ -166,8 +166,8 @@ public class Player implements BattleshipsPlayer {
 //Target mode
         if (shipHit = true) {
             //firstHit = shot;
-             x = shot.x;
-             y = shot.y;
+             x = shot.x; // skal tildeles en type hvis ovenstående indkommenteres
+             y = shot.y; // skal tildeles en type hvis ovenstående indkommenteres
             while (validShot = false) {
                 // Runs through N S E W, checks if the fields
                 for (int i = 0; i < targetModeX.length - 1; i++) {
