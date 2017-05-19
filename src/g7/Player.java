@@ -47,6 +47,7 @@ public class Player implements BattleshipsPlayer {
         hitmap = new int[sizeY][sizeX];
         hitmapLige = new ArrayList<>();
         hitmapUlige = new ArrayList<>();
+        hitmap = fillArray();
         
         for (int y = 0; y < sizeY; y++) {
             for (int x = 0; x < sizeX; x++) {
@@ -139,11 +140,18 @@ public class Player implements BattleshipsPlayer {
 
     @Override
     public Position getFireCoordinates(Fleet enemyShips) {
-
+        
+        //Random lige shot
         Position shot;
-        int x = rnd.nextInt(sizeX);
-        int y = rnd.nextInt(sizeY);
-        shot = new Position(x, y);
+        int index = rnd.nextInt(hitmapLige.size());
+       
+        shot = hitmapLige.get(index);
+        
+        hitmapLige.remove(index);
+        
+        
+        
+        
         
         return shot;
     }
