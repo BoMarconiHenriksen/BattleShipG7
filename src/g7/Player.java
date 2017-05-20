@@ -138,53 +138,46 @@ public class Player implements BattleshipsPlayer {
 
     @Override
     public Position getFireCoordinates(Fleet enemyShips) {
-
-
-        //Random Hunter mode
+        int x = 0;
+        int y = 0;
+//Random Hunter mode
 //        if (shipHit == false) {
-          //  while (validShot = false) {
-                int x = rnd.nextInt(sizeX);
-                int y = rnd.nextInt(sizeY);
-                shot = new Position(x, y); // midlertidig random shooter skal fjernes igen.
+            do {
+                x = rnd.nextInt(sizeX);
+                y = rnd.nextInt(sizeY);
+                //shot = new Position(x, y); // midlertidig random shooter skal fjernes igen.
                 // Checker om tallene er rigtige iforhold til Statistisk Parity meteode for skydning
-//
-//                if (x % 2 == 0 && y % 2 != 0) {
-//                    if (hitmap[x][y] == 0) {
-//                        shot = new Position(x, y);
-//                        validShot = true;
-//                    }
-//                } else if (x % 2 != 0 && y % 2 == 0) {
-//
-//                    if (hitmap[x][y] == 0) {
-//                        shot = new Position(x, y);
-//                        validShot = true;
-//                    }
-//                }
-//            }
-//        }
+
+                if (y % 2 == 0 && x % 2 > 0 || x % 2 == 0 && y % 2 > 0 && hitmap[x][y] == 0) {
+                    shot = new Position(x, y);
+                    validShot = true;
+                }
+            }while(validShot == false);
+         //   return shot;
+       // }
 
 //Target mode
         if (shipHit = true) {
             //firstHit = shot;
-             x = shot.x; // skal tildeles en type hvis ovenstående indkommenteres
-             y = shot.y; // skal tildeles en type hvis ovenstående indkommenteres
-            while (validShot = false) {
-                // Runs through N S E W, checks if the fields
+            x = shot.x; // skal tildeles en type hvis ovenstående indkommenteres
+            y = shot.y; // skal tildeles en type hvis ovenstående indkommenteres
+            do{
+                // Runs through N S E W, checks if the fields are not shot at yet
                 for (int i = 0; i < targetModeX.length - 1; i++) {
                     if (hitmap[x + targetModeX[i]][y + targetModeY[i]] == 0 || hitmap[x + targetModeX[i]][y + targetModeY[i]] == 1) {
                         shot = new Position(x + targetModeX[i], y + targetModeY[i]);
                         validShot = true;
                     }
                 }
-            }
+            }while(validShot = false);
         }
 
         if (DEBUG == true) {
             //Print hitmap for Debug
-            for (int r = hitmap.length - 1; r >= 0; r--) {
+            for (int y1 = hitmap.length - 1; y1 >= 0; y1--) {
                 System.out.println("");
-                for (int c = 0; c < hitmap.length; c++) {
-                    System.out.print(" " + hitmap[r][c]);
+                for (int x1 = 0; x1 < hitmap.length; x1++) {
+                    System.out.print(" " + hitmap[x1][y1]);
                 }
             }
             System.out.println("");
@@ -195,10 +188,9 @@ public class Player implements BattleshipsPlayer {
 
     public int[][] fillArray() {
 
-        //Udfylder map med 1 og 2 taller
-        for (int x = 0; x < sizeX; x++) {
-
-            for (int y = sizeY - 1; y >= 0; y--) {
+        //Udfylder map med 0 og 1 tal
+        for (int y = 0; y < sizeY; y++) {
+            for (int x = sizeX - 1; x >= 0; x--) {
                 if (y % 2 == 0 && x % 2 > 0 || x % 2 == 0 && y % 2 > 0) {
                     hitmap[x][y] = 0; // nummer for hvert felt
                 } else {
@@ -208,10 +200,10 @@ public class Player implements BattleshipsPlayer {
         }
 
         //Print 
-        for (int r = 0; r < hitmap.length - 1; r++) {
+        for (int y = 0; y < hitmap.length - 1; y++) {
             System.out.println("");
-            for (int c = 0; c < hitmap[0].length; c++) {
-                System.out.print(" " + hitmap[r][c]);
+            for (int x = 0; x < hitmap[0].length; x++) {
+                System.out.print(" " + hitmap[x][y]);
             }
         }
         System.out.println("");
