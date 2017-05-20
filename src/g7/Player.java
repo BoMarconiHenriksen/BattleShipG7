@@ -42,7 +42,6 @@ public class Player implements BattleshipsPlayer {
 
     @Override
     public void placeShips(Fleet fleet, Board board) {
-
         sizeX = board.sizeX();
         sizeY = board.sizeY();
         boardTest = new int[sizeY][sizeX];
@@ -138,38 +137,40 @@ public class Player implements BattleshipsPlayer {
 
     @Override
     public Position getFireCoordinates(Fleet enemyShips) {
-        int x = 0;
-        int y = 0;
-//Random Hunter mode
-        if (shipHit == false) {
-            do {
-                x = rnd.nextInt(sizeX);
-                y = rnd.nextInt(sizeY);
-                //shot = new Position(x, y); // midlertidig random shooter skal fjernes igen.
-                // Checker om tallene er rigtige iforhold til Statistisk Parity meteode for skydning
-
-                if (y % 2 == 0 && x % 2 > 0 || x % 2 == 0 && y % 2 > 0 && hitmap[x][y] == 0) {
-                    shot = new Position(x, y);
-                    validShot = true;
-                }
-            }while(validShot == false);
-        }
 
 //Target mode
-        if (shipHit = true) {
+        if (shipHit == true) {
             //firstHit = shot;
-            x = shot.x; // skal tildeles en type hvis ovenstående indkommenteres
-            y = shot.y; // skal tildeles en type hvis ovenstående indkommenteres
-            do{
+            int hitX = shot.x; // skal tildeles en type hvis ovenstående indkommenteres
+            int hitY = shot.y; // skal tildeles en type hvis ovenstående indkommenteres
+            do {
                 // Runs through N S E W, checks if the fields are not shot at yet
                 for (int i = 0; i < targetModeX.length - 1; i++) {
-                    if (hitmap[x + targetModeX[i]][y + targetModeY[i]] == 0 || hitmap[x + targetModeX[i]][y + targetModeY[i]] == 1) {
-                        shot = new Position(x + targetModeX[i], y + targetModeY[i]);
+                    if (hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 0 || hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 1) {
+                        shot = new Position(hitX + targetModeX[i], hitY + targetModeY[i]);
                         validShot = true;
+
+                        // needs fixing, if surounded with fields that are not 0 or 1.
                     }
                 }
-            }while(validShot = false);
+                validShot = true;      // temporary fix for upper standing problem.
+                shipHit = false;       // temporary fix for upper standing problem.
+
+            } while (validShot == false);
         }
+
+//Random Hunter mode
+        do {
+            int x = rnd.nextInt(sizeX);
+            int y = rnd.nextInt(sizeY);
+            //shot = new Position(x, y); // midlertidig random shooter skal fjernes igen.
+            // Checker om tallene er rigtige iforhold til Statistisk Parity meteode for skydning
+
+            if (y % 2 == 0 && x % 2 > 0 || x % 2 == 0 && y % 2 > 0 && hitmap[x][y] == 0) {
+                shot = new Position(x, y);
+                validShot = true;
+            }
+        } while (validShot == false);
 
         if (DEBUG == true) {
             //Print hitmap for Debug
