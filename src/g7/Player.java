@@ -141,7 +141,7 @@ public class Player implements BattleshipsPlayer {
         int x = 0;
         int y = 0;
 //Random Hunter mode
-//        if (shipHit == false) {
+        if (shipHit == false) {
             do {
                 x = rnd.nextInt(sizeX);
                 y = rnd.nextInt(sizeY);
@@ -153,8 +153,7 @@ public class Player implements BattleshipsPlayer {
                     validShot = true;
                 }
             }while(validShot == false);
-         //   return shot;
-       // }
+        }
 
 //Target mode
         if (shipHit = true) {
