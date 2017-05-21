@@ -153,7 +153,7 @@ public class Player implements BattleshipsPlayer {
             do {
                 
                 // Runs through N S E W, checks if the fields are not shot at yet
-                for (int i = 0; i < targetModeX.length - 1; i++) {
+                for (int i = 1; i < targetModeX.length - 1; i++) { //da i bliver lagt til det nye skud skal den starte på 1 ellers skyder den samme sted.
                     if (hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 0 || hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 1) {
                         shot = new Position(hitX + targetModeX[i], hitY + targetModeY[i]);
                         
@@ -163,7 +163,7 @@ public class Player implements BattleshipsPlayer {
                             firedShots.add(shot);
                             validShot = true;
                         }
-
+                        //Skyder kun en gang til højre selv om du også rammer på dit andet skud. Går over til parity shooter
                         // needs fixing, if surounded with fields that are not 0 or 1.
                     }
                 }
@@ -200,10 +200,11 @@ public class Player implements BattleshipsPlayer {
                 System.out.println("");
                 for (int x1 = 0; x1 < hitmap.length; x1++) {
                     System.out.print(" " + hitmap[x1][y1]);
-                    System.out.println("ArrayList FiredShots: " + firedShots);
+                    
                 }
             }
             System.out.println("");
+            System.out.println("ArrayList FiredShots: " + firedShots);
         }
 
         return shot;
