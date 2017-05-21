@@ -151,6 +151,7 @@ public class Player implements BattleshipsPlayer {
             int hitX = shot.x; // skal tildeles en type hvis ovenstående indkommenteres
             int hitY = shot.y; // skal tildeles en type hvis ovenstående indkommenteres
             do {
+                
                 // Runs through N S E W, checks if the fields are not shot at yet
                 for (int i = 0; i < targetModeX.length - 1; i++) {
                     if (hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 0 || hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 1) {
@@ -174,6 +175,7 @@ public class Player implements BattleshipsPlayer {
 
 //Random Hunter mode
         do {
+            
             int x = rnd.nextInt(sizeX);
             int y = rnd.nextInt(sizeY);
             //shot = new Position(x, y); // midlertidig random shooter skal fjernes igen.
@@ -188,8 +190,8 @@ public class Player implements BattleshipsPlayer {
                     firedShots.add(shot);
                     validShot = true;
                 }
-
             }
+            
         } while (validShot == false);
 
         if (DEBUG == true) {
