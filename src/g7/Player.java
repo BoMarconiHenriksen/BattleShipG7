@@ -10,6 +10,7 @@ import battleship.interfaces.Board;
 import battleship.interfaces.Fleet;
 import battleship.interfaces.Position;
 import battleship.interfaces.Ship;
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -30,6 +31,12 @@ public class Player implements BattleshipsPlayer {
     private boolean shipHit = false;
     boolean validShot = false;
     private Position shot;
+    private ArrayList<Position> firedShots = new ArrayList<>();
+    boolean checkShot = true;
+
+    public Player() {
+        this.firedShots = new ArrayList<>();
+    }
 
     @Override
     public void startMatch(int rounds, Fleet ships, int sizeX, int sizeY) {
@@ -148,7 +155,13 @@ public class Player implements BattleshipsPlayer {
                 for (int i = 0; i < targetModeX.length - 1; i++) {
                     if (hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 0 || hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 1) {
                         shot = new Position(hitX + targetModeX[i], hitY + targetModeY[i]);
-                        validShot = true;
+                        
+                        if (firedShots.contains(shot)) {
+                            validShot = false;
+                        } else {
+                            firedShots.add(shot);
+                            validShot = true;
+                        }
 
                         // needs fixing, if surounded with fields that are not 0 or 1.
                     }
@@ -168,7 +181,14 @@ public class Player implements BattleshipsPlayer {
 
             if (y % 2 == 0 && x % 2 > 0 || x % 2 == 0 && y % 2 > 0 && hitmap[x][y] == 0) {
                 shot = new Position(x, y);
-                validShot = true;
+                
+                if (firedShots.contains(shot)) {
+                    validShot = false;
+                } else {
+                    firedShots.add(shot);
+                    validShot = true;
+                }
+
             }
         } while (validShot == false);
 
@@ -178,6 +198,7 @@ public class Player implements BattleshipsPlayer {
                 System.out.println("");
                 for (int x1 = 0; x1 < hitmap.length; x1++) {
                     System.out.print(" " + hitmap[x1][y1]);
+                    System.out.println("ArrayList FiredShots: " + firedShots);
                 }
             }
             System.out.println("");
