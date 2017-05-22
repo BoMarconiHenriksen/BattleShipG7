@@ -137,7 +137,7 @@ public class Player implements BattleshipsPlayer {
     @Override
     public Position getFireCoordinates(Fleet enemyShips) {
         boolean validShot = false;
-
+        
 ////Target mode
         if (shipHit == true) {
             //firstHit = shot;
