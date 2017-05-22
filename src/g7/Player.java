@@ -28,12 +28,7 @@ public class Player implements BattleshipsPlayer {
     private final int[] targetModeX = {0, 0, 1, -1};
     private final int[] targetModeY = {1, -1, 0, 0};
     private Position shot;
-    private ArrayList<Position> firedShots = new ArrayList<>();
     boolean shipHit = false;
-
-    public Player() {
-        this.firedShots = new ArrayList<>();
-    }
 
     @Override
     public void startMatch(int rounds, Fleet ships, int sizeX, int sizeY) {
@@ -75,7 +70,7 @@ public class Player implements BattleshipsPlayer {
                         placed = true;
                         board.placeShip(pos, s, vertical);
                     }
-                    
+
                 }
             }
 
@@ -146,36 +141,41 @@ public class Player implements BattleshipsPlayer {
 ////Target mode
         if (shipHit == true) {
             //firstHit = shot;
-            int hitX = shot.x; // skal tildeles en type hvis ovenstående indkommenteres
-            int hitY = shot.y; // skal tildeles en type hvis ovenstående indkommenteres
+            int hitX = shot.x;
+            int hitY = shot.y;
             do {
-
                 // Runs through N S E W, checks if the fields are not shot at yet
+
                 for (int i = 0; i < targetModeX.length - 1; i++) { //da i bliver lagt til det nye skud skal den starte på 1 ellers skyder den samme sted.
-                    if (hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 0 || hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 1) {
+                    if (hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 0) {
+                        shot = new Position(hitX + targetModeX[i], hitY + targetModeY[i]);
+                        validShot = true;
+                    } else if (hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 1) {
                         shot = new Position(hitX + targetModeX[i], hitY + targetModeY[i]);
                         validShot = true;
                     }
                 }
                 validShot = true;      // temporary fix for upper standing problem.
-                shipHit = false;       // temporary fix for upper standing problem.
+                //   shipHit = false;       // temporary fix for upper standing problem.
 
             } while (validShot == false);
         }
 //Random Hunter mode
-        do {
+        if (shipHit == false) {
+            do {
 
-            int x = rnd.nextInt(sizeX);
-            int y = rnd.nextInt(sizeY);
-            shot = new Position(x, y); // midlertidig random shooter skal fjernes igen.
-            // Checker om tallene er rigtige iforhold til Statistisk Parity meteode for skydning
+                int x = rnd.nextInt(sizeX);
+                int y = rnd.nextInt(sizeY);
+///////////                shot = new Position(x, y); // midlertidig random shooter skal fjernes igen.
+                // Checker om tallene er rigtige iforhold til Statistisk Parity meteode for skydning
 
-//            if ((y % 2 == 0 && x % 2 > 0 && hitmap[x][y] == 0) || (x % 2 == 0 && y % 2 > 0 && hitmap[x][y] == 0)) {
-//                shot = new Position(x, y);
-                validShot = true;
-//            }
+                if ((y % 2 == 0 && x % 2 > 0 && hitmap[x][y] == 0) || (x % 2 == 0 && y % 2 > 0 && hitmap[x][y] == 0)) {
+                    shot = new Position(x, y);
+                    validShot = true;
+                }
 
-        } while (validShot == false);
+            } while (validShot == false);
+        }
 
         if (DEBUG
                 == true) {
@@ -188,34 +188,10 @@ public class Player implements BattleshipsPlayer {
                 }
             }
             System.out.println("");
-            System.out.println("ArrayList FiredShots: " + firedShots);
+            System.out.println("fired shot: " + shot.toString());
         }
 
         return shot;
-    }
-
-    public int[][] fillArray() {
-
-        //Udfylder map med 0 og 1 tal
-        for (int y = 0; y < sizeY; y++) {
-            for (int x = sizeX - 1; x >= 0; x--) {
-                if (y % 2 == 0 && x % 2 > 0 || x % 2 == 0 && y % 2 > 0) {
-                    hitmap[x][y] = 0; // nummer for hvert felt
-                } else {
-                    hitmap[x][y] = 1;
-                }
-            }
-        }
-
-        //Print 
-        for (int y = 0; y < hitmap.length - 1; y++) {
-            System.out.println("");
-            for (int x = 0; x < hitmap[0].length; x++) {
-                System.out.print(" " + hitmap[x][y]);
-            }
-        }
-        System.out.println("");
-        return hitmap;
     }
 
     @Override
@@ -242,6 +218,29 @@ public class Player implements BattleshipsPlayer {
     public void endMatch(int won, int lost, int draw
     ) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public int[][] fillArray() {
+        //Udfylder map med 0 og 1 tal
+        for (int y = 0; y < sizeY; y++) {
+            for (int x = sizeX - 1; x >= 0; x--) {
+                if (y % 2 == 0 && x % 2 > 0 || x % 2 == 0 && y % 2 > 0) {
+                    hitmap[x][y] = 0; // nummer for hvert felt
+                } else {
+                    hitmap[x][y] = 1;
+                }
+            }
+        }
+
+        //Print 
+        for (int y = 0; y < hitmap.length - 1; y++) {
+            System.out.println("");
+            for (int x = 0; x < hitmap[0].length; x++) {
+                System.out.print(" " + hitmap[x][y]);
+            }
+        }
+        System.out.println("");
+        return hitmap;
     }
 
 }
