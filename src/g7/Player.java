@@ -28,7 +28,10 @@ public class Player implements BattleshipsPlayer {
     private final int[] targetModeX = {0, 0, 1, -1};
     private final int[] targetModeY = {1, -1, 0, 0};
     private Position shot;
-    boolean shipHit = false;
+    boolean targetMode = false;
+    private int numberEnemyShips;
+    private Position firstHit;
+        boolean ship = false;
 
     @Override
     public void startMatch(int rounds, Fleet ships, int sizeX, int sizeY) {
@@ -137,31 +140,36 @@ public class Player implements BattleshipsPlayer {
     @Override
     public Position getFireCoordinates(Fleet enemyShips) {
         boolean validShot = false;
-        
-////Target mode
-        if (shipHit == true) {
-            //firstHit = shot;
+        numberEnemyShips = enemyShips.getNumberOfShips();
+
+        ////Target mode
+        if (targetMode == true) {
+            System.out.println("TARGETMODE");
             int hitX = shot.x;
             int hitY = shot.y;
             do {
-                // Runs through N S E W, checks if the fields are not shot at yet
 
-                for (int i = 0; i < targetModeX.length - 1; i++) { //da i bliver lagt til det nye skud skal den starte på 1 ellers skyder den samme sted.
-                    if (hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 0) {
-                        shot = new Position(hitX + targetModeX[i], hitY + targetModeY[i]);
-                        validShot = true;
-                    } else if (hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 1) {
-                        shot = new Position(hitX + targetModeX[i], hitY + targetModeY[i]);
-                        validShot = true;
-                    }
+                //Tjekker værdien på positionen er 1 eller 0 - Nord
+                if (hitmap[hitX][hitY + 1] == 0 || hitmap[hitX][hitY + 1] == 1) {
+                    shot = new Position(hitX, hitY + 1);
+                    validShot = true;
+
+                } else if (hitmap[hitX + 1][hitY] == 0 || hitmap[hitX + 1][hitY] == 1) {
+                    shot = new Position(hitX + 1, hitY);
+                    validShot = true;
+                } else if (hitmap[hitX - 1][hitY] == 0 || hitmap[hitX - 1][hitY] == 1) {
+                    shot = new Position(hitX - 1, hitY);
+                    validShot = true;
+                } else if (hitmap[hitX][hitY - 1] == 0 || hitmap[hitX][hitY - 1] == 1) {
+                    shot = new Position(hitX, hitY - 1);
+                    validShot = true;
                 }
-                validShot = true;      // temporary fix for upper standing problem.
-                //   shipHit = false;       // temporary fix for upper standing problem.
 
             } while (validShot == false);
         }
 //Random Hunter mode
-        if (shipHit == false) {
+        if (targetMode == false) {
+            System.out.println("HUNTMODE");
             do {
 
                 int x = rnd.nextInt(sizeX);
@@ -177,14 +185,12 @@ public class Player implements BattleshipsPlayer {
             } while (validShot == false);
         }
 
-        if (DEBUG
-                == true) {
+        if (DEBUG == true) {
             //Print hitmap for Debug
             for (int y1 = hitmap.length - 1; y1 >= 0; y1--) {
                 System.out.println("");
                 for (int x1 = 0; x1 < hitmap.length; x1++) {
                     System.out.print(" " + hitmap[x1][y1]);
-
                 }
             }
             System.out.println("");
@@ -196,22 +202,34 @@ public class Player implements BattleshipsPlayer {
 
     @Override
     public void hitFeedBack(boolean hit, Fleet enemyShips) {
+        if (hit == true && numberEnemyShips == enemyShips.getNumberOfShips()) {
+            hitmap[shot.x][shot.y] = 2; // HIT BUT NO SINK
+            targetMode = true;
+            ship = true;
 
-        if (hit == true) {
-            shipHit = true;
-            hitmap[shot.x][shot.y] = 2; // HIT
+        } else if (ship == true && hit == false) {
+            hitmap[shot.x][shot.y] = 5; // MISS BUT NO SINK    
+            targetMode = true;
+            
+
+        } else if (hit == true && numberEnemyShips > enemyShips.getNumberOfShips()) {
+            hitmap[shot.x][shot.y] = 2; // HIT SUNK SHIP
+            targetMode = false;
+            ship = false;
+
         } else {
-            hitmap[shot.x][shot.y] = 5; // Missed shot          
-/// skal have lavet et statement der fortsætter med at skyde så længe skibet ikke er sunket, 
-// så den ikke vender tilbage til Hunt mode
-            shipHit = false;
+            hitmap[shot.x][shot.y] = 5; // MISS
+            targetMode = false;
         }
     }
 
     @Override
     public void endRound(int round, int points, int enemyPoints
     ) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        targetMode = false;
+        ship = false;
+        shot = null;
+        firstHit = null;
     }
 
     @Override
@@ -232,7 +250,7 @@ public class Player implements BattleshipsPlayer {
             }
         }
 
-        //Print 
+        //Print
         for (int y = 0; y < hitmap.length - 1; y++) {
             System.out.println("");
             for (int x = 0; x < hitmap[0].length; x++) {
