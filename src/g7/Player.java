@@ -137,41 +137,46 @@ public class Player implements BattleshipsPlayer {
 
     @Override
     public Position getFireCoordinates(Fleet enemyShips) {
-
-//Target mode
-        if (shipHit == true) {
-            //firstHit = shot;
-            int hitX = shot.x;
-            int hitY = shot.y;
-            do {
-                // Runs through N S E W, checks if the fields are not shot at yet
-                for (int i = 0; i < targetModeX.length - 1; i++) {
-                    if (hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 0 || hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 1) {
-                        shot = new Position(hitX + targetModeX[i], hitY + targetModeY[i]);
-                        validShot = true;
-
-                        // needs fixing, if surounded with fields that are not 0 or 1.
-                    }
-                }
-                validShot = true;      // temporary fix for upper standing problem.
-                shipHit = false;       // temporary fix for upper standing problem.
-
-            } while (validShot == false);
-        }
+//
+////Target mode
+//        if (shipHit == true) {
+//            //firstHit = shot;
+//            int hitX = shot.x;
+//            int hitY = shot.y;
+//            do {
+//                // Runs through N S E W, checks if the fields are not shot at yet
+//                for (int i = 0; i < targetModeX.length - 1; i++) {
+//                    if (hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 0 || hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 1) {
+//                        shot = new Position(hitX + targetModeX[i], hitY + targetModeY[i]);
+//                        validShot = true;
+//
+//                        // needs fixing, if surounded with fields that are not 0 or 1.
+//                    }
+//                }
+//                validShot = true;      // temporary fix for upper standing problem.
+//                shipHit = false;       // temporary fix for upper standing problem.
+//
+//            } while (validShot == false);
+//        }
 
 //Random Hunter mode
-        do {
+
+        do{
             int x = rnd.nextInt(sizeX);
             int y = rnd.nextInt(sizeY);
             //shot = new Position(x, y); // midlertidig random shooter skal fjernes igen.
             // Checker om tallene er rigtige iforhold til Statistisk Parity meteode for skydning
 
-            if (y % 2 == 0 && x % 2 > 0 || x % 2 == 0 && y % 2 > 0 && hitmap[x][y] == 0) {
+            if ((y % 2 == 0 && x % 2 > 0 && hitmap[x][y] == 0) || (x % 2 == 0 && y % 2 > 0 && hitmap[x][y] == 0)) {
                 shot = new Position(x, y);
                 validShot = true;
             }
-        } while (validShot == false);
-
+         }while (validShot == false);
+        
+        
+        
+        
+        
         if (DEBUG == true) {
             //Print hitmap for Debug
             for (int y1 = hitmap.length - 1; y1 >= 0; y1--) {
