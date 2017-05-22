@@ -54,12 +54,12 @@ public class Player implements BattleshipsPlayer {
 
         for (int y = 0; y < sizeY; y++) {
             for (int x = 0; x < sizeX; x++) {
-                boardTest[y][x] = 0; // Empty position
+                boardTest[x][y] = 0; // Empty position
             }
         }
 
         for (int i = fleet.getNumberOfShips() - 1; i >= 0; i--) {
-            //Avoid checking the same random position (r,c) more then once when attempting to place a ship
+            //Avoid checking the same random position (x,y) more then once when attempting to place a ship
             Ship s = fleet.getShip(i);
 
             boolean placed = false;
@@ -75,7 +75,7 @@ public class Player implements BattleshipsPlayer {
                         placed = true;
                         board.placeShip(pos, s, vertical);
                     }
-
+                    
                 }
             }
 
@@ -113,21 +113,21 @@ public class Player implements BattleshipsPlayer {
         boolean thereIsRoom = true;
 
         if (vertical) {
-            // East
-            if (x + size > 9 || x - size < 0) {
-                thereIsRoom = false;
-            } else {
-                for (int i = x; i <= x + size && thereIsRoom; i++) {
-                    thereIsRoom = thereIsRoom & (boardTest[i][y] == 0);
-                }
-            }
-
-        } else { // North
+            // North
             if (y + size > 9 || y - size < 0) {
                 thereIsRoom = false;
             } else {
                 for (int i = y; i <= y + size && thereIsRoom; i++) {
                     thereIsRoom = thereIsRoom & (boardTest[x][i] == 0);
+                }
+            }
+
+        } else { // East
+            if (x + size > 9 || x - size < 0) {
+                thereIsRoom = false;
+            } else {
+                for (int i = x; i <= x + size && thereIsRoom; i++) {
+                    thereIsRoom = thereIsRoom & (boardTest[i][y] == 0);
                 }
             }
         }
