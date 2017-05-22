@@ -29,6 +29,8 @@ public class Player implements BattleshipsPlayer {
     private final int[] targetModeY = {1, -1, 0, 0};
     private Position shot;
     boolean shipHit = false;
+    private int numberEnemyShips; 
+    private Position firstHit;
 
     @Override
     public void startMatch(int rounds, Fleet ships, int sizeX, int sizeY) {
@@ -137,25 +139,48 @@ public class Player implements BattleshipsPlayer {
     @Override
     public Position getFireCoordinates(Fleet enemyShips) {
         boolean validShot = false;
-
-////Target mode
+        numberEnemyShips = enemyShips.getNumberOfShips();
+        
+        ////Target mode
         if (shipHit == true) {
-            //firstHit = shot;
+            firstHit = shot;
             int hitX = shot.x;
             int hitY = shot.y;
             do {
+                
+                //Tjekker værdien på positionen er 1 eller 0 - Nord
+                if(hitmap [hitX][hitY + 1] == 0 || hitmap [hitX][hitY + 1] == 1){
+                    shot = new Position(hitX, hitY + 1);
+                    validShot = true;
+                    
+                } else if (hitmap [hitX + 1][hitY] == 0 || hitmap [hitX + 1][hitY] == 1){
+                    shot = new Position(hitX + 1, hitY);
+                    validShot = true;
+                } else if (hitmap [hitX - 1][hitY] == 0 || hitmap [hitX - 1][hitY] == 1){
+                    shot = new Position(hitX - 1, hitY);
+                    validShot = true;
+                }
+                else if (hitmap [hitX][hitY - 1] == 0 || hitmap [hitX][hitY - 1] == 1){
+                    shot = new Position(hitX, hitY - 1);
+                    validShot = true;
+            }
+                
+                
+                
+                
+                
                 // Runs through N S E W, checks if the fields are not shot at yet
 
-                for (int i = 0; i < targetModeX.length - 1; i++) { //da i bliver lagt til det nye skud skal den starte på 1 ellers skyder den samme sted.
-                    if (hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 0) {
-                        shot = new Position(hitX + targetModeX[i], hitY + targetModeY[i]);
-                        validShot = true;
-                    } else if (hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 1) {
-                        shot = new Position(hitX + targetModeX[i], hitY + targetModeY[i]);
-                        validShot = true;
-                    }
-                }
-                validShot = true;      // temporary fix for upper standing problem.
+//                for (int i = 0; i < targetModeX.length - 1; i++) { //da i bliver lagt til det nye skud skal den starte på 1 ellers skyder den samme sted.
+//                    if (hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 0) {
+//                        shot = new Position(hitX + targetModeX[i], hitY + targetModeY[i]);
+//                        validShot = true;
+//                    } else if (hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 1) {
+//                        shot = new Position(hitX + targetModeX[i], hitY + targetModeY[i]);
+//                        validShot = true;
+//                    }
+//                }
+//                validShot = true;      // temporary fix for upper standing problem.
                 //   shipHit = false;       // temporary fix for upper standing problem.
 
             } while (validShot == false);
