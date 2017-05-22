@@ -10,6 +10,7 @@ import battleship.interfaces.Board;
 import battleship.interfaces.Fleet;
 import battleship.interfaces.Position;
 import battleship.interfaces.Ship;
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -23,13 +24,16 @@ public class Player implements BattleshipsPlayer {
     private int sizeX;
     private int sizeY;
     private int[][] boardTest;
-
     private int[][] hitmap;
     private final int[] targetModeX = {0, 0, 1, -1};
     private final int[] targetModeY = {1, -1, 0, 0};
-    private boolean shipHit = false;
-    boolean validShot = false;
     private Position shot;
+    private ArrayList<Position> firedShots = new ArrayList<>();
+    boolean shipHit = false;
+
+    public Player() {
+        this.firedShots = new ArrayList<>();
+    }
 
     @Override
     public void startMatch(int rounds, Fleet ships, int sizeX, int sizeY) {
@@ -44,8 +48,8 @@ public class Player implements BattleshipsPlayer {
     public void placeShips(Fleet fleet, Board board) {
         sizeX = board.sizeX();
         sizeY = board.sizeY();
-        boardTest = new int[sizeY][sizeX];
-        hitmap = new int[sizeY][sizeX];
+        boardTest = new int[sizeX][sizeY];
+        hitmap = new int[sizeX][sizeY];
         hitmap = fillArray();
 
         for (int y = 0; y < sizeY; y++) {
@@ -62,12 +66,12 @@ public class Player implements BattleshipsPlayer {
             while (placed == false) {
                 boolean vertical = rnd.nextBoolean();
                 Position pos;
-                int col = rnd.nextInt(sizeX);
-                int row = rnd.nextInt(sizeY);
-                pos = new Position(col, row);
-                if (boardTest[row][col] == 0) {
-                    if (canPlace(s, row, col, vertical)) {
-                        place(s, row, col, vertical);
+                int x = rnd.nextInt(sizeX);
+                int y = rnd.nextInt(sizeY);
+                pos = new Position(x, y);
+                if (boardTest[x][y] == 0) {
+                    if (canPlace(s, x, y, vertical)) {
+                        place(s, x, y, vertical);
                         placed = true;
                         board.placeShip(pos, s, vertical);
                     }
@@ -77,10 +81,10 @@ public class Player implements BattleshipsPlayer {
 
         }
         if (DEBUG == true) { // SHOWS PLACEMENT MAP FOR SHIPS
-            for (int r = boardTest.length - 1; r >= 0; r--) {
+            for (int y = boardTest.length - 1; y >= 0; y--) {
                 System.out.println("");
-                for (int c = 0; c < boardTest[0].length; c++) {
-                    System.out.print(" " + boardTest[r][c]);
+                for (int x = 0; x < boardTest[0].length; x++) {
+                    System.out.print(" " + boardTest[x][y]);
                 }
             }
             System.out.println("");
@@ -88,42 +92,42 @@ public class Player implements BattleshipsPlayer {
     }
 
 //places the passed ship on the board starting at position (x,y) and going towards the passed direction
-    public void place(Ship s, int row, int col, boolean vertical) {
+    public void place(Ship s, int x, int y, boolean vertical) {
         int size = s.size() - 1;
 
         if (vertical) {
-            for (int i = row; i <= row + size; i++) {
-                boardTest[i][col] = 1;
+            for (int i = y; i <= y + size; i++) {
+                boardTest[x][i] = 1;
                 //1 = placed ship
             }
         } else {
-            for (int i = col; i <= col + size; i++) {
-                boardTest[row][i] = 1;
+            for (int i = x; i <= x + size; i++) {
+                boardTest[i][y] = 1;
             }
         }
     }
 
     //returns true if the passed ship can be placed on the board starting at position (x,y) and going towards the passed direction
-    public boolean canPlace(Ship s, int row, int col, boolean vertical) {
+    public boolean canPlace(Ship s, int x, int y, boolean vertical) {
         int size = s.size() - 1;
         boolean thereIsRoom = true;
 
         if (vertical) {
-            // North
-            if (row + size > 9 || row - size < 0) {
+            // East
+            if (x + size > 9 || x - size < 0) {
                 thereIsRoom = false;
             } else {
-                for (int i = row; i <= row + size && thereIsRoom; i++) {
-                    thereIsRoom = thereIsRoom & (boardTest[i][col] == 0);
+                for (int i = x; i <= x + size && thereIsRoom; i++) {
+                    thereIsRoom = thereIsRoom & (boardTest[i][y] == 0);
                 }
             }
 
-        } else { // East
-            if (col + size > 9 || col - size < 0) {
+        } else { // North
+            if (y + size > 9 || y - size < 0) {
                 thereIsRoom = false;
             } else {
-                for (int i = col; i <= col + size && thereIsRoom; i++) {
-                    thereIsRoom = thereIsRoom & (boardTest[row][i] == 0);
+                for (int i = y; i <= y + size && thereIsRoom; i++) {
+                    thereIsRoom = thereIsRoom & (boardTest[x][i] == 0);
                 }
             }
         }
@@ -137,55 +141,54 @@ public class Player implements BattleshipsPlayer {
 
     @Override
     public Position getFireCoordinates(Fleet enemyShips) {
-//
+        boolean validShot = false;
+
 ////Target mode
-//        if (shipHit == true) {
-//            //firstHit = shot;
-//            int hitX = shot.x;
-//            int hitY = shot.y;
-//            do {
-//                // Runs through N S E W, checks if the fields are not shot at yet
-//                for (int i = 0; i < targetModeX.length - 1; i++) {
-//                    if (hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 0 || hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 1) {
-//                        shot = new Position(hitX + targetModeX[i], hitY + targetModeY[i]);
-//                        validShot = true;
-//
-//                        // needs fixing, if surounded with fields that are not 0 or 1.
-//                    }
-//                }
-//                validShot = true;      // temporary fix for upper standing problem.
-//                shipHit = false;       // temporary fix for upper standing problem.
-//
-//            } while (validShot == false);
-//        }
+        if (shipHit == true) {
+            //firstHit = shot;
+            int hitX = shot.x; // skal tildeles en type hvis ovenstående indkommenteres
+            int hitY = shot.y; // skal tildeles en type hvis ovenstående indkommenteres
+            do {
 
+                // Runs through N S E W, checks if the fields are not shot at yet
+                for (int i = 0; i < targetModeX.length - 1; i++) { //da i bliver lagt til det nye skud skal den starte på 1 ellers skyder den samme sted.
+                    if (hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 0 || hitmap[hitX + targetModeX[i]][hitY + targetModeY[i]] == 1) {
+                        shot = new Position(hitX + targetModeX[i], hitY + targetModeY[i]);
+                        validShot = true;
+                    }
+                }
+                validShot = true;      // temporary fix for upper standing problem.
+                shipHit = false;       // temporary fix for upper standing problem.
+
+            } while (validShot == false);
+        }
 //Random Hunter mode
+        do {
 
-        do{
             int x = rnd.nextInt(sizeX);
             int y = rnd.nextInt(sizeY);
-            //shot = new Position(x, y); // midlertidig random shooter skal fjernes igen.
+            shot = new Position(x, y); // midlertidig random shooter skal fjernes igen.
             // Checker om tallene er rigtige iforhold til Statistisk Parity meteode for skydning
 
-            if ((y % 2 == 0 && x % 2 > 0 && hitmap[x][y] == 0) || (x % 2 == 0 && y % 2 > 0 && hitmap[x][y] == 0)) {
-                shot = new Position(x, y);
+//            if ((y % 2 == 0 && x % 2 > 0 && hitmap[x][y] == 0) || (x % 2 == 0 && y % 2 > 0 && hitmap[x][y] == 0)) {
+//                shot = new Position(x, y);
                 validShot = true;
-            }
-         }while (validShot == false);
-        
-        
-        
-        
-        
-        if (DEBUG == true) {
+//            }
+
+        } while (validShot == false);
+
+        if (DEBUG
+                == true) {
             //Print hitmap for Debug
             for (int y1 = hitmap.length - 1; y1 >= 0; y1--) {
                 System.out.println("");
                 for (int x1 = 0; x1 < hitmap.length; x1++) {
                     System.out.print(" " + hitmap[x1][y1]);
+
                 }
             }
             System.out.println("");
+            System.out.println("ArrayList FiredShots: " + firedShots);
         }
 
         return shot;
