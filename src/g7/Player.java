@@ -141,8 +141,8 @@ public class Player implements BattleshipsPlayer {
 //Target mode
         if (shipHit == true) {
             //firstHit = shot;
-            int hitX = shot.x; // skal tildeles en type hvis ovenstående indkommenteres
-            int hitY = shot.y; // skal tildeles en type hvis ovenstående indkommenteres
+            int hitX = shot.x;
+            int hitY = shot.y;
             do {
                 // Runs through N S E W, checks if the fields are not shot at yet
                 for (int i = 0; i < targetModeX.length - 1; i++) {
