@@ -30,8 +30,8 @@ public class Player implements BattleshipsPlayer {
     private Position shot;
     boolean targetMode = false;
     private int numberEnemyShips;
-    private Position firstHit;
-        boolean ship = false;
+    private ArrayList<Position> targetModeList;
+    boolean ship = false;
 
     @Override
     public void startMatch(int rounds, Fleet ships, int sizeX, int sizeY) {
@@ -49,6 +49,7 @@ public class Player implements BattleshipsPlayer {
         boardTest = new int[sizeX][sizeY];
         hitmap = new int[sizeX][sizeY];
         hitmap = fillArray();
+        targetModeList = new ArrayList<>();
 
         for (int y = 0; y < sizeY; y++) {
             for (int x = 0; x < sizeX; x++) {
@@ -145,10 +146,11 @@ public class Player implements BattleshipsPlayer {
         ////Target mode
         if (targetMode == true) {
             System.out.println("TARGETMODE");
+
+            do {
             int hitX = shot.x;
             int hitY = shot.y;
-            do {
-
+            
                 //Tjekker værdien på positionen er 1 eller 0 - Nord
                 if (hitmap[hitX][hitY + 1] == 0 || hitmap[hitX][hitY + 1] == 1) {
                     shot = new Position(hitX, hitY + 1);
@@ -163,8 +165,11 @@ public class Player implements BattleshipsPlayer {
                 } else if (hitmap[hitX][hitY - 1] == 0 || hitmap[hitX][hitY - 1] == 1) {
                     shot = new Position(hitX, hitY - 1);
                     validShot = true;
+                } else {
+                    System.out.println("Reset targetmode to 1'st hit ");
+                    shot = targetModeList.get(0);
+                    validShot = false;
                 }
-
             } while (validShot == false);
         }
 //Random Hunter mode
@@ -204,17 +209,19 @@ public class Player implements BattleshipsPlayer {
     public void hitFeedBack(boolean hit, Fleet enemyShips) {
         if (hit == true && numberEnemyShips == enemyShips.getNumberOfShips()) {
             hitmap[shot.x][shot.y] = 2; // HIT BUT NO SINK
+            targetModeList.add(shot);
             targetMode = true;
             ship = true;
 
         } else if (ship == true && hit == false) {
             hitmap[shot.x][shot.y] = 5; // MISS BUT NO SINK    
+            shot = targetModeList.get(targetModeList.size() - 1);
             targetMode = true;
-            
 
         } else if (hit == true && numberEnemyShips > enemyShips.getNumberOfShips()) {
             hitmap[shot.x][shot.y] = 2; // HIT SUNK SHIP
             targetMode = false;
+            targetModeList.clear();
             ship = false;
 
         } else {
@@ -229,7 +236,6 @@ public class Player implements BattleshipsPlayer {
         targetMode = false;
         ship = false;
         shot = null;
-        firstHit = null;
     }
 
     @Override
