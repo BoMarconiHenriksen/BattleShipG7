@@ -148,21 +148,24 @@ public class Player implements BattleshipsPlayer {
             System.out.println("TARGETMODE");
 
             do {
-            int hitX = shot.x;
-            int hitY = shot.y;
-            
-                //Tjekker værdien på positionen er 1 eller 0 - Nord
-                if (hitmap[hitX][hitY + 1] == 0 || hitmap[hitX][hitY + 1] == 1) {
+                int hitX = shot.x;
+                int hitY = shot.y;
+
+                //Tjekker værdien på positionen er 1 eller 0
+                // North
+                if (hitY + 1 <= 9 && hitmap[hitX][hitY + 1] == 0 || hitY + 1 <= 9 && hitmap[hitX][hitY + 1] == 1) {
                     shot = new Position(hitX, hitY + 1);
                     validShot = true;
-
-                } else if (hitmap[hitX + 1][hitY] == 0 || hitmap[hitX + 1][hitY] == 1) {
+                } //East
+                else if (hitX + 1 <= 9 && hitmap[hitX + 1][hitY] == 0 || hitX + 1 <= 9 && hitmap[hitX + 1][hitY] == 1) {
                     shot = new Position(hitX + 1, hitY);
                     validShot = true;
-                } else if (hitmap[hitX - 1][hitY] == 0 || hitmap[hitX - 1][hitY] == 1) {
+                } //West
+                else if (hitX - 1 >= 0 && hitmap[hitX - 1][hitY] == 0 || hitX - 1 >= 0 && hitmap[hitX - 1][hitY] == 1) {
                     shot = new Position(hitX - 1, hitY);
                     validShot = true;
-                } else if (hitmap[hitX][hitY - 1] == 0 || hitmap[hitX][hitY - 1] == 1) {
+                } //South
+                else if (hitY - 1 >= 0 && hitmap[hitX][hitY - 1] == 0 || hitY - 1 >= 0 && hitmap[hitX][hitY - 1] == 1) {
                     shot = new Position(hitX, hitY - 1);
                     validShot = true;
                 } else {
@@ -170,10 +173,12 @@ public class Player implements BattleshipsPlayer {
                     shot = targetModeList.get(0);
                     validShot = false;
                 }
+
             } while (validShot == false);
         }
-//Random Hunter mode
-        if (targetMode == false) {
+        //Random Hunter mode
+        if (targetMode
+                == false) {
             System.out.println("HUNTMODE");
             do {
 
@@ -190,7 +195,8 @@ public class Player implements BattleshipsPlayer {
             } while (validShot == false);
         }
 
-        if (DEBUG == true) {
+        if (DEBUG
+                == true) {
             //Print hitmap for Debug
             for (int y1 = hitmap.length - 1; y1 >= 0; y1--) {
                 System.out.println("");
