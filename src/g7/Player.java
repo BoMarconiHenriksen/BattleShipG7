@@ -27,11 +27,12 @@ public class Player implements BattleshipsPlayer {
     private int[][] hitmap;
     private final int[] targetModeX = {0, 0, 1, -1};
     private final int[] targetModeY = {1, -1, 0, 0};
-    private Position shot;
+    private Position shot, missedShot;
     boolean targetMode = false;
     private int numberEnemyShips;
     private ArrayList<Position> targetModeList;
     boolean ship = false;
+    
 
     @Override
     public void startMatch(int rounds, Fleet ships, int sizeX, int sizeY) {
@@ -146,18 +147,20 @@ public class Player implements BattleshipsPlayer {
         ////Target mode
         if (targetMode == true) {
             System.out.println("TARGETMODE");
-
             do {
                 int hitX = shot.x;
                 int hitY = shot.y;
-
+                if(hitmap[missedShot.x][missedShot.y] == 5 && hitmap[shot.x][shot.y] == 2){
+                    shot = targetModeList.get(0);
+                }
+                
                 //Tjekker værdien på positionen er 1 eller 0
                 // North
-                if (hitY + 1 <= 9 && hitmap[hitX][hitY + 1] == 0 || hitY + 1 <= 9 && hitmap[hitX][hitY + 1] == 1) {
+                if ( hitY + 1 <= 9 && hitmap[hitX][hitY + 1] == 0 || hitY + 1 <= 9 && hitmap[hitX][hitY + 1] == 1) {
                     shot = new Position(hitX, hitY + 1);
                     validShot = true;
                 } //East
-                else if (hitX + 1 <= 9 && hitmap[hitX + 1][hitY] == 0 || hitX + 1 <= 9 && hitmap[hitX + 1][hitY] == 1) {
+                else if ( hitX + 1 <= 9 && hitmap[hitX + 1][hitY] == 0 || hitX + 1 <= 9 && hitmap[hitX + 1][hitY] == 1) {
                     shot = new Position(hitX + 1, hitY);
                     validShot = true;
                 } //West
@@ -165,7 +168,7 @@ public class Player implements BattleshipsPlayer {
                     shot = new Position(hitX - 1, hitY);
                     validShot = true;
                 } //South
-                else if (hitY - 1 >= 0 && hitmap[hitX][hitY - 1] == 0 || hitY - 1 >= 0 && hitmap[hitX][hitY - 1] == 1) {
+                else if (hitY - 1 >= 0 && hitmap[hitX][hitY - 1] == 0 ||hitY - 1 >= 0 && hitmap[hitX][hitY - 1] == 1) {
                     shot = new Position(hitX, hitY - 1);
                     validShot = true;
                 } else {
@@ -220,7 +223,8 @@ public class Player implements BattleshipsPlayer {
             ship = true;
 
         } else if (ship == true && hit == false) {
-            hitmap[shot.x][shot.y] = 5; // MISS BUT NO SINK    
+            hitmap[shot.x][shot.y] = 5; // MISS BUT NO SINK
+            missedShot = shot;
             shot = targetModeList.get(targetModeList.size() - 1);
             targetMode = true;
 
