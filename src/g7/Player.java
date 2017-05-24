@@ -231,6 +231,7 @@ public class Player implements BattleshipsPlayer {
 
         } else if (hit == true && numberEnemyShipsBefore > enemyShips.getNumberOfShips()) {
             System.out.println("help !!");
+            targetModeList.add(shot);
             hitmap[shot.x][shot.y] = 2; // HIT SUNK SHIP
             remainingEnemyShipsCount = enemyShipCount(enemyShips);
             totalActiveShips -= remainingEnemyShipsCount;
@@ -267,10 +268,11 @@ public class Player implements BattleshipsPlayer {
                 }
 
             } else {
+                System.out.println("abe");
                 totalActiveShips = enemyShipCount(enemyShips);
                 targetModeList.clear();
-                ship = false;
                 targetMode = false;
+                ship = false;
             }
         } else {
             hitmap[shot.x][shot.y] = 5; // MISS
