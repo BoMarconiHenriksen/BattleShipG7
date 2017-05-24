@@ -29,10 +29,10 @@ public class Player implements BattleshipsPlayer {
     private final int[] targetModeY = {1, -1, 0, 0};
     private Position shot, missedShot;
     boolean targetMode = false;
-    private int numberEnemyShips;
+    private int numberEnemyShipsBefore;
     private ArrayList<Position> targetModeList;
     boolean ship = false;
-    
+    private int totalActiveShips = 17;
 
     @Override
     public void startMatch(int rounds, Fleet ships, int sizeX, int sizeY) {
@@ -142,7 +142,7 @@ public class Player implements BattleshipsPlayer {
     @Override
     public Position getFireCoordinates(Fleet enemyShips) {
         boolean validShot = false;
-        numberEnemyShips = enemyShips.getNumberOfShips();
+        numberEnemyShipsBefore = enemyShips.getNumberOfShips();
 
         ////Target mode
         if (targetMode == true) {
@@ -150,17 +150,18 @@ public class Player implements BattleshipsPlayer {
             do {
                 int hitX = shot.x;
                 int hitY = shot.y;
-                if(hitmap[missedShot.x][missedShot.y] == 5 && hitmap[shot.x][shot.y] == 2){
+
+                if (targetModeList.size() > 0 && hitmap[missedShot.x][missedShot.y] == 5 && hitmap[shot.x][shot.y] == 2) {
                     shot = targetModeList.get(0);
                 }
-                
+
                 //Tjekker værdien på positionen er 1 eller 0
                 // North
-                if ( hitY + 1 <= 9 && hitmap[hitX][hitY + 1] == 0 || hitY + 1 <= 9 && hitmap[hitX][hitY + 1] == 1) {
+                if (hitY + 1 <= 9 && hitmap[hitX][hitY + 1] == 0 || hitY + 1 <= 9 && hitmap[hitX][hitY + 1] == 1) {
                     shot = new Position(hitX, hitY + 1);
                     validShot = true;
                 } //East
-                else if ( hitX + 1 <= 9 && hitmap[hitX + 1][hitY] == 0 || hitX + 1 <= 9 && hitmap[hitX + 1][hitY] == 1) {
+                else if (hitX + 1 <= 9 && hitmap[hitX + 1][hitY] == 0 || hitX + 1 <= 9 && hitmap[hitX + 1][hitY] == 1) {
                     shot = new Position(hitX + 1, hitY);
                     validShot = true;
                 } //West
@@ -168,7 +169,7 @@ public class Player implements BattleshipsPlayer {
                     shot = new Position(hitX - 1, hitY);
                     validShot = true;
                 } //South
-                else if (hitY - 1 >= 0 && hitmap[hitX][hitY - 1] == 0 ||hitY - 1 >= 0 && hitmap[hitX][hitY - 1] == 1) {
+                else if (hitY - 1 >= 0 && hitmap[hitX][hitY - 1] == 0 || hitY - 1 >= 0 && hitmap[hitX][hitY - 1] == 1) {
                     shot = new Position(hitX, hitY - 1);
                     validShot = true;
                 } else {
@@ -180,8 +181,7 @@ public class Player implements BattleshipsPlayer {
             } while (validShot == false);
         }
         //Random Hunter mode
-        if (targetMode
-                == false) {
+        if (targetMode == false) {
             System.out.println("HUNTMODE");
             do {
 
@@ -216,7 +216,8 @@ public class Player implements BattleshipsPlayer {
 
     @Override
     public void hitFeedBack(boolean hit, Fleet enemyShips) {
-        if (hit == true && numberEnemyShips == enemyShips.getNumberOfShips()) {
+        int remainingEnemyShipsCount = 0;
+        if (hit == true && numberEnemyShipsBefore == enemyShips.getNumberOfShips()) {
             hitmap[shot.x][shot.y] = 2; // HIT BUT NO SINK
             targetModeList.add(shot);
             targetMode = true;
@@ -228,16 +229,62 @@ public class Player implements BattleshipsPlayer {
             shot = targetModeList.get(targetModeList.size() - 1);
             targetMode = true;
 
-        } else if (hit == true && numberEnemyShips > enemyShips.getNumberOfShips()) {
+        } else if (hit == true && numberEnemyShipsBefore > enemyShips.getNumberOfShips()) {
+            System.out.println("help !!");
             hitmap[shot.x][shot.y] = 2; // HIT SUNK SHIP
-            targetMode = false;
-            targetModeList.clear();
-            ship = false;
+            remainingEnemyShipsCount = enemyShipCount(enemyShips);
+            totalActiveShips -= remainingEnemyShipsCount;
 
+            if (totalActiveShips < targetModeList.size()) {
+                targetMode = true;
+                Position testShot;
+                boolean invalidShot = true;
+                System.out.println("Special start");
+                for (int i = 0; i < targetModeList.size() && invalidShot; i++) {
+                    testShot = targetModeList.get(i);
+                    int x = testShot.x;
+                    int y = testShot.y;
+                    System.out.println("Special Occasions");
+                    while (invalidShot = true) {
+                        if (y + 1 <= 9 && hitmap[x][y + 1] == 0 || y + 1 <= 9 && hitmap[x][y + 1] == 1) {
+                            shot = new Position(x, y + 1);
+                            invalidShot = false;
+                        } //East
+                        else if (x + 1 <= 9 && hitmap[x + 1][y] == 0 || x + 1 <= 9 && hitmap[x + 1][y] == 1) {
+                            shot = new Position(x + 1, y);
+                            invalidShot = false;
+                        } //West
+                        else if (x - 1 >= 0 && hitmap[x - 1][y] == 0 || x - 1 >= 0 && hitmap[x - 1][y] == 1) {
+                            shot = new Position(x - 1, y);
+                            invalidShot = false;
+                        } //South
+                        else if (y - 1 >= 0 && hitmap[x][y - 1] == 0 || y - 1 >= 0 && hitmap[x][y - 1] == 1) {
+                            shot = new Position(x, y - 1);
+                            invalidShot = false;
+                        }
+
+                    }
+                }
+
+            } else {
+                totalActiveShips = enemyShipCount(enemyShips);
+                targetModeList.clear();
+                ship = false;
+                targetMode = false;
+            }
         } else {
             hitmap[shot.x][shot.y] = 5; // MISS
             targetMode = false;
         }
+    }
+
+    public int enemyShipCount(Fleet enemyShips) {
+        int totalCount = 0;
+        for (int i = 0; i <= enemyShips.getNumberOfShips(); i++) {
+            totalCount += enemyShips.getShip(i).size();
+        }
+
+        return totalCount;
     }
 
     @Override
