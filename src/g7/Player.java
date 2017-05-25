@@ -45,6 +45,98 @@ public class Player implements BattleshipsPlayer {
 
     @Override
     public void placeShips(Fleet fleet, Board board) {
+        //randomPlaceShip(fleet, board);
+        
+        //shipHøjreSide(fleet, board);
+        //Tæt på kanten
+        //shipVenstreSide(fleet, board);
+        //Mere spred ind mod midten
+        //sprederVenstreSide(fleet, board);
+        
+        //shipTopHalvdel(fleet, board);
+        
+        //shipPlacementRightCornerTop(fleet, board);
+        
+        
+        
+        //Virker ikke
+        //skibeVedKanter(fleet, board);
+        
+        randomPatternShipplacement(fleet, board);
+
+    }
+    
+    public void randomPatternShipplacement(Fleet fleet, Board board) {
+        int x = rnd.nextInt(6);
+        
+        switch (x) {
+            case 1:
+                sprederVenstreSide(fleet, board);
+                break;
+            case 2:
+                shipVenstreSide(fleet, board);
+                break;
+            case 3:
+                shipTopHalvdel(fleet, board);
+                break;
+            case 4:
+                randomPlaceShip(fleet, board);
+                break;
+            case 5:
+                shipPlacementRightCornerTop(fleet, board);
+                break;
+            case 6:
+                shipHøjreSide(fleet, board);
+                break;
+            default:
+                randomPlaceShip(fleet, board);
+        }
+    }
+    
+    //patteren skive der ikke ligger op ad hinanden
+
+//    public void skibeVedKanter(Fleet fleet, Board board) {
+//        sizeX = board.sizeX();
+//        sizeY = board.sizeY();
+//        boardTest = new int[sizeX][sizeY];
+//        hitmap = new int[sizeX][sizeY];
+//        hitmap = fillArray();
+//        targetModeList = new ArrayList<>();
+//
+//        emptyPositions();
+//
+//        for (int i = fleet.getNumberOfShips() - 1; i >= 0; i--) {
+//            //Avoid checking the same random position (x,y) more then once when attempting to place a ship
+//            Ship s = fleet.getShip(i);
+//
+//            boolean placed = false;
+//            while (placed == false) {
+//                boolean vertical = rnd.nextBoolean();
+//                if (vertical == true) {
+//                    Position pos;
+//                    int x = rnd.nextInt(2);
+//                    if (x == 1) {
+//                        x = 9;
+//                    }
+//                    int y = rnd.nextInt(sizeY);
+//                    pos = new Position(x, y);
+//                    if (boardTest[x][y] == 0) {
+//                        if (canPlace(s, x, y, vertical)) {
+//                            place(s, x, y, vertical);
+//                            placed = true;
+//                            board.placeShip(pos, s, vertical);
+//                        }
+//
+//                    }
+//                }
+//            }
+//        }
+//        if (DEBUG == true) { // SHOWS PLACEMENT MAP FOR SHIPS
+//            printBoard();
+//        }
+//    }
+    
+    public void sprederVenstreSide(Fleet fleet, Board board) {
         sizeX = board.sizeX();
         sizeY = board.sizeY();
         boardTest = new int[sizeX][sizeY];
@@ -52,11 +144,193 @@ public class Player implements BattleshipsPlayer {
         hitmap = fillArray();
         targetModeList = new ArrayList<>();
 
-        for (int y = 0; y < sizeY; y++) {
-            for (int x = 0; x < sizeX; x++) {
-                boardTest[x][y] = 0; // Empty position
+        emptyPositions();
+
+        for (int i = fleet.getNumberOfShips() - 1; i >= 0; i--) {
+            //Avoid checking the same random position (x,y) more then once when attempting to place a ship
+            Ship s = fleet.getShip(i);
+
+            boolean placed = false;
+            while (placed == false) {
+                boolean vertical = rnd.nextBoolean();
+                Position pos;
+                int x = rnd.nextInt(5);
+                int y = rnd.nextInt(sizeY);
+                pos = new Position(x, y);
+                if (boardTest[x][y] == 0) {
+                    if (canPlace(s, x, y, vertical)) {
+                        place(s, x, y, vertical);
+                        placed = true;
+                        board.placeShip(pos, s, vertical);
+                    }
+
+                }
             }
+
         }
+        if (DEBUG == true) { // SHOWS PLACEMENT MAP FOR SHIPS
+            printBoard();
+        }
+    }
+
+    public void shipPlacementRightCornerTop(Fleet fleet, Board board) {
+        sizeX = board.sizeX();
+        sizeY = board.sizeY();
+        boardTest = new int[sizeX][sizeY];
+        hitmap = new int[sizeX][sizeY];
+        hitmap = fillArray();
+        targetModeList = new ArrayList<>();
+
+        emptyPositions();
+
+        for (int i = fleet.getNumberOfShips() - 1; i >= 0; i--) {
+            //Avoid checking the same random position (x,y) more then once when attempting to place a ship
+            Ship s = fleet.getShip(i);
+
+            boolean placed = false;
+            while (placed == false) {
+                boolean vertical = rnd.nextBoolean();
+                Position pos;
+                int x = rnd.nextInt(5) + 5;
+                int y = rnd.nextInt(5) + 5;
+                pos = new Position(x, y);
+                if (boardTest[x][y] == 0) {
+                    if (canPlace(s, x, y, vertical)) {
+                        place(s, x, y, vertical);
+                        placed = true;
+                        board.placeShip(pos, s, vertical);
+                    }
+
+                }
+            }
+
+        }
+        if (DEBUG == true) { // SHOWS PLACEMENT MAP FOR SHIPS
+            printBoard();
+        }
+    }
+    
+    //Venstre halvdel af boardet
+    public void shipVenstreSide(Fleet fleet, Board board) {
+        sizeX = board.sizeX();
+        sizeY = board.sizeY();
+        boardTest = new int[sizeX][sizeY];
+        hitmap = new int[sizeX][sizeY];
+        hitmap = fillArray();
+        targetModeList = new ArrayList<>();
+
+        emptyPositions();
+
+        for (int i = fleet.getNumberOfShips() - 1; i >= 0; i--) {
+            //Avoid checking the same random position (x,y) more then once when attempting to place a ship
+            Ship s = fleet.getShip(i);
+
+            boolean placed = false;
+            while (placed == false) {
+                boolean vertical = rnd.nextBoolean();
+                Position pos;
+                int x = rnd.nextInt(5);
+                int y = rnd.nextInt(5);
+                pos = new Position(x, y);
+                if (boardTest[x][y] == 0) {
+                    if (canPlace(s, x, y, vertical)) {
+                        place(s, x, y, vertical);
+                        placed = true;
+                        board.placeShip(pos, s, vertical);
+                    }
+
+                }
+            }
+
+        }
+        if (DEBUG == true) { // SHOWS PLACEMENT MAP FOR SHIPS
+            printBoard();
+        }
+    }
+
+    public void shipTopHalvdel(Fleet fleet, Board board) {
+        sizeX = board.sizeX();
+        sizeY = board.sizeY();
+        boardTest = new int[sizeX][sizeY];
+        hitmap = new int[sizeX][sizeY];
+        hitmap = fillArray();
+        targetModeList = new ArrayList<>();
+
+        emptyPositions();
+
+        for (int i = fleet.getNumberOfShips() - 1; i >= 0; i--) {
+            //Avoid checking the same random position (x,y) more then once when attempting to place a ship
+            Ship s = fleet.getShip(i);
+
+            boolean placed = false;
+            while (placed == false) {
+                boolean vertical = rnd.nextBoolean();
+                Position pos;
+                int x = rnd.nextInt(5);
+                int y = rnd.nextInt(5) + 5;
+                pos = new Position(x, y);
+                if (boardTest[x][y] == 0) {
+                    if (canPlace(s, x, y, vertical)) {
+                        place(s, x, y, vertical);
+                        placed = true;
+                        board.placeShip(pos, s, vertical);
+                    }
+
+                }
+            }
+
+        }
+        if (DEBUG == true) { // SHOWS PLACEMENT MAP FOR SHIPS
+            printBoard();
+        }
+    }
+
+    public void shipHøjreSide(Fleet fleet, Board board) {
+        sizeX = board.sizeX();
+        sizeY = board.sizeY();
+        boardTest = new int[sizeX][sizeY];
+        hitmap = new int[sizeX][sizeY];
+        hitmap = fillArray();
+        targetModeList = new ArrayList<>();
+
+        emptyPositions();
+
+        for (int i = fleet.getNumberOfShips() - 1; i >= 0; i--) {
+            //Avoid checking the same random position (x,y) more then once when attempting to place a ship
+            Ship s = fleet.getShip(i);
+
+            boolean placed = false;
+            while (placed == false) {
+                boolean vertical = rnd.nextBoolean();
+                Position pos;
+                int x = rnd.nextInt(5) + 5;
+                int y = rnd.nextInt(5);
+                pos = new Position(x, y);
+                if (boardTest[x][y] == 0) {
+                    if (canPlace(s, x, y, vertical)) {
+                        place(s, x, y, vertical);
+                        placed = true;
+                        board.placeShip(pos, s, vertical);
+                    }
+
+                }
+            }
+
+        }
+        if (DEBUG == true) { // SHOWS PLACEMENT MAP FOR SHIPS
+            printBoard();
+        }
+    }
+
+    public void randomPlaceShip(Fleet fleet, Board board) {
+        sizeX = board.sizeX();
+        sizeY = board.sizeY();
+        boardTest = new int[sizeX][sizeY];
+        hitmap = new int[sizeX][sizeY];
+        hitmap = fillArray();
+        targetModeList = new ArrayList<>();
+
+        emptyPositions();
 
         for (int i = fleet.getNumberOfShips() - 1; i >= 0; i--) {
             //Avoid checking the same random position (x,y) more then once when attempting to place a ship
@@ -81,13 +355,24 @@ public class Player implements BattleshipsPlayer {
 
         }
         if (DEBUG == true) { // SHOWS PLACEMENT MAP FOR SHIPS
-            for (int y = boardTest.length - 1; y >= 0; y--) {
-                System.out.println("");
-                for (int x = 0; x < boardTest[0].length; x++) {
-                    System.out.print(" " + boardTest[x][y]);
-                }
+            printBoard();
+        }
+    }
+    
+    public void emptyPositions() {
+        for (int y = 0; y < sizeY; y++) {
+            for (int x = 0; x < sizeX; x++) {
+                boardTest[x][y] = 0; // Empty position
             }
+        }
+    }
+    
+    public void printBoard() {
+        for (int y = boardTest.length - 1; y >= 0; y--) {
             System.out.println("");
+            for (int x = 0; x < boardTest[0].length; x++) {
+                System.out.print(" " + boardTest[x][y]);
+            }
         }
     }
 
@@ -144,13 +429,13 @@ public class Player implements BattleshipsPlayer {
         boolean validShot = false;
         numberEnemyShipsBefore = enemyShips.getNumberOfShips();
         totalActiveShips = enemyShipCount(enemyShips);
-        
+
         ////Target mode
         if (targetMode == true) {
             System.out.println("TARGETMODE");
             shot = validShot();
         }
-        
+
         //Random Hunter mode
         if (targetMode == false) {
             System.out.println("HUNTMODE");
@@ -250,7 +535,7 @@ public class Player implements BattleshipsPlayer {
                 validShot = new Position(x - 1, y);
             }
             //South
-            if (y - 1 >=0 && hitmap[x][y - 1] <= 1) {
+            if (y - 1 >= 0 && hitmap[x][y - 1] <= 1) {
                 validShot = new Position(x, y - 1);
             }
 
