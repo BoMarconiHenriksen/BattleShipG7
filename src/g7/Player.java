@@ -144,13 +144,13 @@ public class Player implements BattleshipsPlayer {
         boolean validShot = false;
         numberEnemyShipsBefore = enemyShips.getNumberOfShips();
         totalActiveShips = enemyShipCount(enemyShips);
-        
-        ////Target mode
+
+        //Target mode
         if (targetMode == true) {
             System.out.println("TARGETMODE");
             shot = validShot();
         }
-        
+
         //Random Hunter mode
         if (targetMode == false) {
             System.out.println("HUNTMODE");
@@ -158,19 +158,16 @@ public class Player implements BattleshipsPlayer {
 
                 int x = rnd.nextInt(sizeX);
                 int y = rnd.nextInt(sizeY);
-///////////                shot = new Position(x, y); // midlertidig random shooter skal fjernes igen.
-                // Checker om tallene er rigtige iforhold til Statistisk Parity meteode for skydning
 
+                // Checker om tallene er rigtige i forhold til Statistisk parity meteode for skydning
                 if ((y % 2 == 0 && x % 2 > 0 && hitmap[x][y] == 0) || (x % 2 == 0 && y % 2 > 0 && hitmap[x][y] == 0)) {
                     shot = new Position(x, y);
                     validShot = true;
                 }
-
             } while (validShot == false);
         }
 
-        if (DEBUG
-                == true) {
+        if (DEBUG == true) {
             //Print hitmap for Debug
             for (int y1 = hitmap.length - 1; y1 >= 0; y1--) {
                 System.out.println("");
@@ -186,8 +183,7 @@ public class Player implements BattleshipsPlayer {
     }
 
     @Override
-    public void hitFeedBack(boolean hit, Fleet enemyShips
-    ) {
+    public void hitFeedBack(boolean hit, Fleet enemyShips) {
         int remainingEnemyShipsCount = 0;
         if (hit == true && numberEnemyShipsBefore == enemyShips.getNumberOfShips()) {
             hitmap[shot.x][shot.y] = 2; // HIT BUT NO SINK
@@ -233,9 +229,9 @@ public class Player implements BattleshipsPlayer {
     public Position validShot() {
         Position validShot = null;
 
-        for (Position shot : targetModeList) {
-            int x = shot.x;
-            int y = shot.y;
+        for (Position shotToValidate : targetModeList) {
+            int x = shotToValidate.x;
+            int y = shotToValidate.y;
 
             //North
             if (y + 1 < sizeY && hitmap[x][y + 1] <= 1) {
@@ -250,7 +246,7 @@ public class Player implements BattleshipsPlayer {
                 validShot = new Position(x - 1, y);
             }
             //South
-            if (y - 1 >=0 && hitmap[x][y - 1] <= 1) {
+            if (y - 1 >= 0 && hitmap[x][y - 1] <= 1) {
                 validShot = new Position(x, y - 1);
             }
 
@@ -270,6 +266,21 @@ public class Player implements BattleshipsPlayer {
     public void endMatch(int won, int lost, int draw
     ) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public Position hitMap(int largestShip) {
+        Position shot = null;
+        int[][] hitmapStat = hitmap;
+
+        for (int y = hitmapStat.length - 1; y < 0; y--) {
+            for (int x = 0; x < hitmapStat.length - 1; x++) {
+
+                if (hitmapStat[x][y] <= 1) {
+                        
+                }
+            }
+        }
+        return shot;
     }
 
     public int[][] fillArray() {
