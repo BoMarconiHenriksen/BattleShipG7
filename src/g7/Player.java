@@ -18,22 +18,19 @@ import java.util.Random;
  * @author Stanislav
  */
 public class Player implements BattleshipsPlayer {
-
-    private final boolean DEBUG = true;
-    private final static Random rnd = new Random();
+    private Random rnd = new Random();
+    private final boolean DEBUG = false;
     private int sizeX;
     private int sizeY;
     private int[][] boardTest;
     private int[][] parityMap;
-    private final int[] targetModeX = {0, 0, 1, -1};
-    private final int[] targetModeY = {1, -1, 0, 0};
     private Position shot;
     boolean targetMode = false;
-    private int numberEnemyShipsBefore;
+    private int numberEnemyShipsBefore = 0;
     private ArrayList<Position> targetModeList;
     boolean ship = false;
     private int totalActiveShips = 0;
-    private int[][] hitmapStat;
+    private int[][] hitmapStat = null;
 
     @Override
     public void startMatch(int rounds, Fleet ships, int sizeX, int sizeY) {
@@ -41,31 +38,18 @@ public class Player implements BattleshipsPlayer {
 
     @Override
     public void startRound(int round) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
     }
 
     @Override
     public void placeShips(Fleet fleet, Board board) {
-        //randomPlaceShip(fleet, board);
-
-        //shipHøjreSide(fleet, board);
-        //Tæt på kanten
-        //shipVenstreSide(fleet, board);
-        //Mere spred ind mod midten
-        //sprederVenstreSide(fleet, board);
-        //shipTopHalvdel(fleet, board);
-        //shipPlacementRightCornerTop(fleet, board);
-        //Virker ikke
-        //skibeVedKanter(fleet, board);
         randomPatternShipplacement(fleet, board);
-
     }
 
     public void randomPatternShipplacement(Fleet fleet, Board board) {
-        hitmapStat = new int[sizeX][sizeY];
-        fillHitmap();
-        System.out.println("placement");
+
         int x = rnd.nextInt(6);
+
         switch (x) {
             case 1:
                 sprederVenstreSide(fleet, board);
@@ -90,47 +74,6 @@ public class Player implements BattleshipsPlayer {
         }
     }
 
-    //patteren skive der ikke ligger op ad hinanden
-//    public void skibeVedKanter(Fleet fleet, Board board) {
-//        sizeX = board.sizeX();
-//        sizeY = board.sizeY();
-//        boardTest = new int[sizeX][sizeY];
-//        hitmap = new int[sizeX][sizeY];
-//        hitmap = fillParityArray();
-//        targetModeList = new ArrayList<>();
-//
-//        emptyPositions();
-//
-//        for (int i = fleet.getNumberOfShips() - 1; i >= 0; i--) {
-//            //Avoid checking the same random position (x,y) more then once when attempting to place a ship
-//            Ship s = fleet.getShip(i);
-//
-//            boolean placed = false;
-//            while (placed == false) {
-//                boolean vertical = rnd.nextBoolean();
-//                if (vertical == true) {
-//                    Position pos;
-//                    int x = rnd.nextInt(2);
-//                    if (x == 1) {
-//                        x = 9;
-//                    }
-//                    int y = rnd.nextInt(sizeY);
-//                    pos = new Position(x, y);
-//                    if (boardTest[x][y] == 0) {
-//                        if (canPlace(s, x, y, vertical)) {
-//                            place(s, x, y, vertical);
-//                            placed = true;
-//                            board.placeShip(pos, s, vertical);
-//                        }
-//
-//                    }
-//                }
-//            }
-//        }
-//        if (DEBUG == true) { // SHOWS PLACEMENT MAP FOR SHIPS
-//            printBoard();
-//        }
-//    }
     public void sprederVenstreSide(Fleet fleet, Board board) {
         sizeX = board.sizeX();
         sizeY = board.sizeY();
@@ -422,7 +365,12 @@ public class Player implements BattleshipsPlayer {
     @Override
     public Position getFireCoordinates(Fleet enemyShips) {
         numberEnemyShipsBefore = enemyShips.getNumberOfShips();
-        int largestShip = enemyShips.getShip(enemyShips.getNumberOfShips()).size();
+        int largestShip = enemyShips.getShip(numberEnemyShipsBefore - 1).size();
+
+        if (hitmapStat == null) {
+            fillHitmap();
+            printHitmap();
+        }
 
         //Target mode
         if (targetMode == true) {
@@ -432,6 +380,7 @@ public class Player implements BattleshipsPlayer {
             //Random Hunter mode
             System.out.println("HUNTMODE");
             hitmapStatFill(largestShip);
+            printHitmap();
             shot = bestShot();
             totalActiveShips = enemyShipCount(enemyShips);
         }
@@ -457,6 +406,7 @@ public class Player implements BattleshipsPlayer {
 
         if (hit == true && numberEnemyShipsBefore == enemyShips.getNumberOfShips()) {
             parityMap[shot.x][shot.y] = 2; // HIT BUT NO SINK
+            hitmapStat[shot.x][shot.y] = 0; // updates statistic map
             targetModeList.add(shot);
             targetMode = true;
             ship = true;
@@ -464,8 +414,9 @@ public class Player implements BattleshipsPlayer {
         } else if (hit == true && ship == true && numberEnemyShipsBefore > enemyShips.getNumberOfShips()) {
             targetModeList.add(shot);
             parityMap[shot.x][shot.y] = 2; // HIT SUNK SHIP
+            hitmapStat[shot.x][shot.y] = 0; // updates statistic map
 
-            if (totalSunkShips < targetModeList.size() - 1) {
+            if (totalSunkShips < targetModeList.size()) {
                 targetMode = true;
                 ship = true;
             } else {
@@ -476,11 +427,14 @@ public class Player implements BattleshipsPlayer {
             }
         } else if (ship == true && hit == false) {
             parityMap[shot.x][shot.y] = 5; // MISS BUT NO SINK
+            hitmapStat[shot.x][shot.y] = 0; // updates statistic map
             targetMode = true;
         } else {
             parityMap[shot.x][shot.y] = 5; // MISS
+            hitmapStat[shot.x][shot.y] = 0; // updates statistic map
             targetMode = false;
         }
+
     }
 
     public int enemyShipCount(Fleet enemyShips) {
@@ -525,6 +479,8 @@ public class Player implements BattleshipsPlayer {
         targetMode = false;
         ship = false;
         shot = null;
+        hitmapStat = null;
+        targetModeList = null;
     }
 
     @Override
@@ -537,7 +493,6 @@ public class Player implements BattleshipsPlayer {
         int shotStatistic = 0;
         for (int y = hitmapStat.length - 1; y >= 0; y--) {
             for (int x = 0; x < hitmapStat.length; x++) {
-                System.out.println("bestShot");
                 // Checker om tallene er rigtige i forhold til Statistisk parity meteode for skydning 
                 // og finder det sted med bedst sandsynlighed for et skib.
                 if ((y % 2 == 0 && x % 2 > 0) && hitmapStat[x][y] > shotStatistic || (x % 2 == 0 && y % 2 > 0) && hitmapStat[x][y] > shotStatistic) {
@@ -551,16 +506,19 @@ public class Player implements BattleshipsPlayer {
 
     public void hitmapStatFill(int largestShip) {
         boolean vertical = true;
-        boolean horizontal = false;
-        System.out.println("-------------hitmap FIllStats");
+        
         for (int y = hitmapStat.length - 1; y >= 0; y--) {
             for (int x = 0; x < hitmapStat.length; x++) {
                 if (hitmapCanPlace(largestShip, x, y, vertical)) {
                     hitmapCounter(largestShip, x, y, vertical);
                 }
-
-                if (hitmapCanPlace(largestShip, x, y, horizontal)) {
-                    hitmapCounter(largestShip, x, y, horizontal);
+            }
+        }
+        vertical = false;
+        for (int y = hitmapStat.length - 1; y >= 0; y--) {
+            for (int x = 0; x < hitmapStat.length; x++) {
+                if (hitmapCanPlace(largestShip, x, y, vertical)) {
+                    hitmapCounter(largestShip, x, y, vertical);
                 }
             }
         }
@@ -568,7 +526,6 @@ public class Player implements BattleshipsPlayer {
 
     public boolean hitmapCanPlace(int largestShipSize, int x, int y, boolean vertical) {
         boolean thereIsRoom = true;
-        System.out.println("hitmapCanPlace");
 
         if (vertical) {
             // North
@@ -620,16 +577,20 @@ public class Player implements BattleshipsPlayer {
     }
 
     public void fillHitmap() {
-        for (int y = sizeY; y >= 0; y--) {
+        hitmapStat = new int[sizeX][sizeY];
+
+        for (int y = sizeY - 1; y >= 0; y--) {
             for (int x = 0; x < sizeX; x++) {
                 hitmapStat[x][y] = 1;
             }
         }
+    }
 
-        for (int y = sizeY; y >= 0; y--) {
+    public void printHitmap() {
+        for (int y = sizeY - 1; y >= 0; y--) {
             System.out.println("");
             for (int x = 0; x < sizeX; x++) {
-                System.out.println(hitmapStat[x][y]+" ");
+                System.out.print(hitmapStat[x][y] + " ");
             }
         }
     }
