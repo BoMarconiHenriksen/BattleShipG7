@@ -50,8 +50,7 @@ public class Player implements BattleshipsPlayer {
         targetModeList = new ArrayList<>();
 
         emptyPositions();
-
-        randomPatternShipplacement(fleet, board);
+         randomPatternShipplacement(fleet, board);
     }
 
     public void randomPatternShipplacement(Fleet fleet, Board board) {
@@ -303,7 +302,7 @@ public class Player implements BattleshipsPlayer {
                 return false;
             } else {
                 for (int i = 0; i < shipSize; i++) {
-                    if (board[x][y + i] == 0) {
+                    if (board[x][y + i] <= 0) {
                         return false;
                     }
                 }
@@ -314,7 +313,7 @@ public class Player implements BattleshipsPlayer {
                 return false;
             } else {
                 for (int i = 0; i < shipSize; i++) {
-                    if (board[x + i][y] == 0) {
+                    if (board[x + i][y] <= 0) {
                         return false;
                     }
                 }
@@ -335,56 +334,61 @@ public class Player implements BattleshipsPlayer {
 
         if (hitmapStat == null) {
             fillHitmap();
-            printHitmap();
         }
 
         //Target mode
         if (targetMode == true) {
-            System.out.println("TARGETMODE");
-            shot = validShot();
+
+            // Runs check for horizontal or vertical ship in targetMode 
+            if (!targetModeList.isEmpty()) {
+
+                for (Position lastHit : targetModeList) {
+
+                    if (lastHit.y + 1 <= 9 && hitmapStat[lastHit.x][lastHit.y + 1] == -1
+                            || lastHit.y - 1 >= 0 && hitmapStat[lastHit.x][lastHit.y - 1] == -1) {
+                        shot = verticalShot();
+                    } else if (lastHit.x + 1 <= 9 && hitmapStat[lastHit.x + 1][lastHit.y] == -1
+                            || lastHit.x - 1 >= 0 && hitmapStat[lastHit.x - 1][lastHit.y] == -1) {
+                        shot = horizontalShot();
+                    } else if (hitmapStat[shot.x][shot.y] <= 0) {
+                        shot = validShot();
+                    } else {
+                        shot = validShot();
+                    }
+
+                }
+            }
+
         } else {
             //Random Hunter mode
-            System.out.println("HUNTMODE");
-            printHitmap();
             hitmapStatFill(largestShip);
             shot = bestShot();
             totalActiveShips = enemyShipCount(enemyShips);
-        }
-
-        if (DEBUG == true) {
-            //Print hitmap for Debug
-            for (int y1 = hitmapStat.length - 1; y1 >= 0; y1--) {
-                System.out.println("");
-                for (int x1 = 0; x1 < hitmapStat.length; x1++) {
-                    System.out.print(" " + hitmapStat[x1][y1]);
-                }
-            }
-            System.out.println("");
-            System.out.println("fired shot: " + shot.toString());
         }
 
         return shot;
     }
 
     @Override
-    public void hitFeedBack(boolean hit, Fleet enemyShips) {
+    public void hitFeedBack(boolean hit, Fleet enemyShips
+    ) {
         int totalSunkShips = totalActiveShips - enemyShipCount(enemyShips);
 
         if (hit == true && numberEnemyShipsBefore == enemyShips.getNumberOfShips()) {
-            hitmapStat[shot.x][shot.y] = 0; // updates statistic map
+            hitmapStat[shot.x][shot.y] = -1; // updates statistic map
             targetModeList.add(shot);
             targetMode = true;
             ship = true;
 
         } else if (hit == true && ship == true && numberEnemyShipsBefore > enemyShips.getNumberOfShips()) {
             targetModeList.add(shot);
-            hitmapStat[shot.x][shot.y] = 0; // updates statistic map
+            hitmapStat[shot.x][shot.y] = -1; // updates statistic map
 
             if (totalSunkShips < targetModeList.size()) {
                 targetMode = true;
                 ship = true;
             } else {
-                System.out.println("abe");
+                hitMapSunkenShip();
                 targetModeList.clear();
                 targetMode = false;
                 ship = false;
@@ -392,20 +396,66 @@ public class Player implements BattleshipsPlayer {
         } else if (ship == true && hit == false) {
             hitmapStat[shot.x][shot.y] = 0; // updates statistic map
             targetMode = true;
-        } else {
+        } else if (hit == false) {
             hitmapStat[shot.x][shot.y] = 0; // updates statistic map
             targetMode = false;
         }
 
     }
 
-    public int enemyShipCount(Fleet enemyShips) {
-        int totalCount = 0;
-        for (int i = 0; i < enemyShips.getNumberOfShips(); i++) {
-            totalCount += enemyShips.getShip(i).size();
+    public void hitMapSunkenShip() {
+        for (Position pos : targetModeList) {
+            hitmapStat[pos.x][pos.y] = -2;
         }
+    }
 
-        return totalCount;
+    public Position verticalShot() {
+        Position validShot = null;
+        int shot = 0;
+        for (Position shotToValidate : targetModeList) {
+            int x = shotToValidate.x;
+            int y = shotToValidate.y;
+
+            //North
+            if (y + 1 < sizeY && hitmapStat[x][y + 1] > shot) {
+                validShot = new Position(x, y + 1);
+                shot = hitmapStat[x][y + 1];
+            }
+            //South
+            if (y - 1 >= 0 && hitmapStat[x][y - 1] > shot) {
+                validShot = new Position(x, y - 1);
+                shot = hitmapStat[x][y - 1];
+            }
+        }
+        if (validShot == null) {
+            validShot = validShot();
+        }
+        return validShot;
+    }
+
+    public Position horizontalShot() {
+        Position validShot = null;
+        int shot = 0;
+        for (Position shotToValidate : targetModeList) {
+            int x = shotToValidate.x;
+            int y = shotToValidate.y;
+
+            //East
+            if (x + 1 < sizeX && hitmapStat[x + 1][y] > shot) {
+                validShot = new Position(x + 1, y);
+                shot = hitmapStat[x + 1][y];
+            }
+
+            //West
+            if (x - 1 >= 0 && hitmapStat[x - 1][y] > shot) {
+                validShot = new Position(x - 1, y);
+                shot = hitmapStat[x - 1][y];
+            }
+        }
+        if (validShot == null) {
+            validShot = validShot();
+        }
+        return validShot;
     }
 
     public Position validShot() {
@@ -468,6 +518,15 @@ public class Player implements BattleshipsPlayer {
             }
         }
         return bestShot;
+    }
+
+    public int enemyShipCount(Fleet enemyShips) {
+        int totalCount = 0;
+        for (int i = 0; i < enemyShips.getNumberOfShips(); i++) {
+            totalCount += enemyShips.getShip(i).size();
+        }
+
+        return totalCount;
     }
 
     public void hitmapStatFill(int largestShip) {
