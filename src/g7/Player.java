@@ -11,6 +11,7 @@ import battleship.interfaces.Fleet;
 import battleship.interfaces.Position;
 import battleship.interfaces.Ship;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -18,12 +19,12 @@ import java.util.Random;
  * @author Stanislav
  */
 public class Player implements BattleshipsPlayer {
+
     private Random rnd = new Random();
     private final boolean DEBUG = false;
     private int sizeX;
     private int sizeY;
     private int[][] boardTest;
-    private int[][] parityMap;
     private Position shot;
     boolean targetMode = false;
     private int numberEnemyShipsBefore = 0;
@@ -43,6 +44,13 @@ public class Player implements BattleshipsPlayer {
 
     @Override
     public void placeShips(Fleet fleet, Board board) {
+        sizeX = board.sizeX();
+        sizeY = board.sizeY();
+        boardTest = new int[sizeX][sizeY];
+        targetModeList = new ArrayList<>();
+
+        emptyPositions();
+
         randomPatternShipplacement(fleet, board);
     }
 
@@ -75,15 +83,6 @@ public class Player implements BattleshipsPlayer {
     }
 
     public void sprederVenstreSide(Fleet fleet, Board board) {
-        sizeX = board.sizeX();
-        sizeY = board.sizeY();
-        boardTest = new int[sizeX][sizeY];
-        parityMap = new int[sizeX][sizeY];
-        parityMap = fillParityArray();
-        targetModeList = new ArrayList<>();
-
-        emptyPositions();
-
         for (int i = fleet.getNumberOfShips() - 1; i >= 0; i--) {
             //Avoid checking the same random position (x,y) more then once when attempting to place a ship
             Ship s = fleet.getShip(i);
@@ -95,8 +94,8 @@ public class Player implements BattleshipsPlayer {
                 int x = rnd.nextInt(5);
                 int y = rnd.nextInt(sizeY);
                 pos = new Position(x, y);
-                if (boardTest[x][y] == 0) {
-                    if (canPlace(s, x, y, vertical)) {
+                if (boardTest[x][y] == 1) {
+                    if (canPlace(s.size(), x, y, vertical, boardTest)) {
                         place(s, x, y, vertical);
                         placed = true;
                         board.placeShip(pos, s, vertical);
@@ -112,14 +111,6 @@ public class Player implements BattleshipsPlayer {
     }
 
     public void shipPlacementRightCornerTop(Fleet fleet, Board board) {
-        sizeX = board.sizeX();
-        sizeY = board.sizeY();
-        boardTest = new int[sizeX][sizeY];
-        parityMap = new int[sizeX][sizeY];
-        parityMap = fillParityArray();
-        targetModeList = new ArrayList<>();
-
-        emptyPositions();
 
         for (int i = fleet.getNumberOfShips() - 1; i >= 0; i--) {
             //Avoid checking the same random position (x,y) more then once when attempting to place a ship
@@ -132,8 +123,8 @@ public class Player implements BattleshipsPlayer {
                 int x = rnd.nextInt(5) + 5;
                 int y = rnd.nextInt(5) + 5;
                 pos = new Position(x, y);
-                if (boardTest[x][y] == 0) {
-                    if (canPlace(s, x, y, vertical)) {
+                if (boardTest[x][y] == 1) {
+                    if (canPlace(s.size(), x, y, vertical, boardTest)) {
                         place(s, x, y, vertical);
                         placed = true;
                         board.placeShip(pos, s, vertical);
@@ -150,14 +141,6 @@ public class Player implements BattleshipsPlayer {
 
     //Venstre halvdel af boardet
     public void shipVenstreSide(Fleet fleet, Board board) {
-        sizeX = board.sizeX();
-        sizeY = board.sizeY();
-        boardTest = new int[sizeX][sizeY];
-        parityMap = new int[sizeX][sizeY];
-        parityMap = fillParityArray();
-        targetModeList = new ArrayList<>();
-
-        emptyPositions();
 
         for (int i = fleet.getNumberOfShips() - 1; i >= 0; i--) {
             //Avoid checking the same random position (x,y) more then once when attempting to place a ship
@@ -170,8 +153,8 @@ public class Player implements BattleshipsPlayer {
                 int x = rnd.nextInt(5);
                 int y = rnd.nextInt(5);
                 pos = new Position(x, y);
-                if (boardTest[x][y] == 0) {
-                    if (canPlace(s, x, y, vertical)) {
+                if (boardTest[x][y] == 1) {
+                    if (canPlace(s.size(), x, y, vertical, boardTest)) {
                         place(s, x, y, vertical);
                         placed = true;
                         board.placeShip(pos, s, vertical);
@@ -187,14 +170,6 @@ public class Player implements BattleshipsPlayer {
     }
 
     public void shipTopHalvdel(Fleet fleet, Board board) {
-        sizeX = board.sizeX();
-        sizeY = board.sizeY();
-        boardTest = new int[sizeX][sizeY];
-        parityMap = new int[sizeX][sizeY];
-        parityMap = fillParityArray();
-        targetModeList = new ArrayList<>();
-
-        emptyPositions();
 
         for (int i = fleet.getNumberOfShips() - 1; i >= 0; i--) {
             //Avoid checking the same random position (x,y) more then once when attempting to place a ship
@@ -207,8 +182,8 @@ public class Player implements BattleshipsPlayer {
                 int x = rnd.nextInt(5);
                 int y = rnd.nextInt(5) + 5;
                 pos = new Position(x, y);
-                if (boardTest[x][y] == 0) {
-                    if (canPlace(s, x, y, vertical)) {
+                if (boardTest[x][y] == 1) {
+                    if (canPlace(s.size(), x, y, vertical, boardTest)) {
                         place(s, x, y, vertical);
                         placed = true;
                         board.placeShip(pos, s, vertical);
@@ -224,14 +199,6 @@ public class Player implements BattleshipsPlayer {
     }
 
     public void shipHøjreSide(Fleet fleet, Board board) {
-        sizeX = board.sizeX();
-        sizeY = board.sizeY();
-        boardTest = new int[sizeX][sizeY];
-        parityMap = new int[sizeX][sizeY];
-        parityMap = fillParityArray();
-        targetModeList = new ArrayList<>();
-
-        emptyPositions();
 
         for (int i = fleet.getNumberOfShips() - 1; i >= 0; i--) {
             //Avoid checking the same random position (x,y) more then once when attempting to place a ship
@@ -244,8 +211,8 @@ public class Player implements BattleshipsPlayer {
                 int x = rnd.nextInt(5) + 5;
                 int y = rnd.nextInt(5);
                 pos = new Position(x, y);
-                if (boardTest[x][y] == 0) {
-                    if (canPlace(s, x, y, vertical)) {
+                if (boardTest[x][y] == 1) {
+                    if (canPlace(s.size(), x, y, vertical, boardTest)) {
                         place(s, x, y, vertical);
                         placed = true;
                         board.placeShip(pos, s, vertical);
@@ -264,8 +231,6 @@ public class Player implements BattleshipsPlayer {
         sizeX = board.sizeX();
         sizeY = board.sizeY();
         boardTest = new int[sizeX][sizeY];
-        parityMap = new int[sizeX][sizeY];
-        parityMap = fillParityArray();
         targetModeList = new ArrayList<>();
 
         emptyPositions();
@@ -281,8 +246,8 @@ public class Player implements BattleshipsPlayer {
                 int x = rnd.nextInt(sizeX);
                 int y = rnd.nextInt(sizeY);
                 pos = new Position(x, y);
-                if (boardTest[x][y] == 0) {
-                    if (canPlace(s, x, y, vertical)) {
+                if (boardTest[x][y] == 1) {
+                    if (canPlace(s.size(), x, y, vertical, boardTest)) {
                         place(s, x, y, vertical);
                         placed = true;
                         board.placeShip(pos, s, vertical);
@@ -300,7 +265,7 @@ public class Player implements BattleshipsPlayer {
     public void emptyPositions() {
         for (int y = 0; y < sizeY; y++) {
             for (int x = 0; x < sizeX; x++) {
-                boardTest[x][y] = 0; // Empty position
+                boardTest[x][y] = 1; // Empty position
             }
         }
     }
@@ -316,45 +281,46 @@ public class Player implements BattleshipsPlayer {
 
 //places the passed ship on the board starting at position (x,y) and going towards the passed direction
     public void place(Ship s, int x, int y, boolean vertical) {
-        int size = s.size() - 1;
+        int size = s.size();
 
         if (vertical) {
-            for (int i = y; i <= y + size; i++) {
-                boardTest[x][i] = 1;
-                //1 = placed ship
+            for (int i = 0; i < size; i++) {
+                boardTest[x][y + i] = 0;
+                //0 = placed ship
             }
         } else {
-            for (int i = x; i <= x + size; i++) {
-                boardTest[i][y] = 1;
+            for (int i = 0; i < size; i++) {
+                boardTest[x + i][y] = 0;
             }
         }
     }
 
     //returns true if the passed ship can be placed on the board starting at position (x,y) and going towards the passed direction
-    public boolean canPlace(Ship s, int x, int y, boolean vertical) {
-        int size = s.size() - 1;
-        boolean thereIsRoom = true;
-
+    public boolean canPlace(int shipSize, int x, int y, boolean vertical, int[][] board) {
         if (vertical) {
             // North
-            if (y + size > 9 || y - size < 0) {
-                thereIsRoom = false;
+            if (y - 1 + shipSize > 9 || y < 0) {
+                return false;
             } else {
-                for (int i = y; i <= y + size && thereIsRoom; i++) {
-                    thereIsRoom = thereIsRoom & (boardTest[x][i] == 0);
+                for (int i = 0; i < shipSize; i++) {
+                    if (board[x][y + i] == 0) {
+                        return false;
+                    }
                 }
             }
 
         } else { // East
-            if (x + size > 9 || x - size < 0) {
-                thereIsRoom = false;
+            if (x - 1 + shipSize > 9 || x < 0) {
+                return false;
             } else {
-                for (int i = x; i <= x + size && thereIsRoom; i++) {
-                    thereIsRoom = thereIsRoom & (boardTest[i][y] == 0);
+                for (int i = 0; i < shipSize; i++) {
+                    if (board[x + i][y] == 0) {
+                        return false;
+                    }
                 }
             }
         }
-        return thereIsRoom;
+        return true;
     }
 
     @Override
@@ -379,18 +345,18 @@ public class Player implements BattleshipsPlayer {
         } else {
             //Random Hunter mode
             System.out.println("HUNTMODE");
-            hitmapStatFill(largestShip);
             printHitmap();
+            hitmapStatFill(largestShip);
             shot = bestShot();
             totalActiveShips = enemyShipCount(enemyShips);
         }
 
         if (DEBUG == true) {
             //Print hitmap for Debug
-            for (int y1 = parityMap.length - 1; y1 >= 0; y1--) {
+            for (int y1 = hitmapStat.length - 1; y1 >= 0; y1--) {
                 System.out.println("");
-                for (int x1 = 0; x1 < parityMap.length; x1++) {
-                    System.out.print(" " + parityMap[x1][y1]);
+                for (int x1 = 0; x1 < hitmapStat.length; x1++) {
+                    System.out.print(" " + hitmapStat[x1][y1]);
                 }
             }
             System.out.println("");
@@ -405,7 +371,6 @@ public class Player implements BattleshipsPlayer {
         int totalSunkShips = totalActiveShips - enemyShipCount(enemyShips);
 
         if (hit == true && numberEnemyShipsBefore == enemyShips.getNumberOfShips()) {
-            parityMap[shot.x][shot.y] = 2; // HIT BUT NO SINK
             hitmapStat[shot.x][shot.y] = 0; // updates statistic map
             targetModeList.add(shot);
             targetMode = true;
@@ -413,7 +378,6 @@ public class Player implements BattleshipsPlayer {
 
         } else if (hit == true && ship == true && numberEnemyShipsBefore > enemyShips.getNumberOfShips()) {
             targetModeList.add(shot);
-            parityMap[shot.x][shot.y] = 2; // HIT SUNK SHIP
             hitmapStat[shot.x][shot.y] = 0; // updates statistic map
 
             if (totalSunkShips < targetModeList.size()) {
@@ -426,11 +390,9 @@ public class Player implements BattleshipsPlayer {
                 ship = false;
             }
         } else if (ship == true && hit == false) {
-            parityMap[shot.x][shot.y] = 5; // MISS BUT NO SINK
             hitmapStat[shot.x][shot.y] = 0; // updates statistic map
             targetMode = true;
         } else {
-            parityMap[shot.x][shot.y] = 5; // MISS
             hitmapStat[shot.x][shot.y] = 0; // updates statistic map
             targetMode = false;
         }
@@ -448,26 +410,30 @@ public class Player implements BattleshipsPlayer {
 
     public Position validShot() {
         Position validShot = null;
-
+        int shot = 0;
         for (Position shotToValidate : targetModeList) {
             int x = shotToValidate.x;
             int y = shotToValidate.y;
 
             //North
-            if (y + 1 < sizeY && parityMap[x][y + 1] <= 1) {
+            if (y + 1 < sizeY && hitmapStat[x][y + 1] > shot) {
                 validShot = new Position(x, y + 1);
+                shot = hitmapStat[x][y + 1];
             }
             //East
-            if (x + 1 < sizeX && parityMap[x + 1][y] <= 1) {
+            if (x + 1 < sizeX && hitmapStat[x + 1][y] > shot) {
                 validShot = new Position(x + 1, y);
+                shot = hitmapStat[x + 1][y];
             }
             //West
-            if (x - 1 >= 0 && parityMap[x - 1][y] <= 1) {
+            if (x - 1 >= 0 && hitmapStat[x - 1][y] > shot) {
                 validShot = new Position(x - 1, y);
+                shot = hitmapStat[x - 1][y];
             }
             //South
-            if (y - 1 >= 0 && parityMap[x][y - 1] <= 1) {
+            if (y - 1 >= 0 && hitmapStat[x][y - 1] > shot) {
                 validShot = new Position(x, y - 1);
+                shot = hitmapStat[x][y - 1];
             }
 
         }
@@ -506,10 +472,10 @@ public class Player implements BattleshipsPlayer {
 
     public void hitmapStatFill(int largestShip) {
         boolean vertical = true;
-        
+
         for (int y = hitmapStat.length - 1; y >= 0; y--) {
             for (int x = 0; x < hitmapStat.length; x++) {
-                if (hitmapCanPlace(largestShip, x, y, vertical)) {
+                if (canPlace(largestShip, x, y, vertical, hitmapStat)) {
                     hitmapCounter(largestShip, x, y, vertical);
                 }
             }
@@ -517,63 +483,24 @@ public class Player implements BattleshipsPlayer {
         vertical = false;
         for (int y = hitmapStat.length - 1; y >= 0; y--) {
             for (int x = 0; x < hitmapStat.length; x++) {
-                if (hitmapCanPlace(largestShip, x, y, vertical)) {
+                if (canPlace(largestShip, x, y, vertical, hitmapStat)) {
                     hitmapCounter(largestShip, x, y, vertical);
                 }
             }
         }
     }
 
-    public boolean hitmapCanPlace(int largestShipSize, int x, int y, boolean vertical) {
-        boolean thereIsRoom = true;
-
-        if (vertical) {
-            // North
-            if (y + largestShipSize > 9 || y - largestShipSize < 0) {
-                thereIsRoom = false;
-            } else {
-                for (int i = y; i <= y + largestShipSize && thereIsRoom; i++) {
-                    thereIsRoom = thereIsRoom & (hitmapStat[x][i] > 0);
-                }
-            }
-
-        } else { // East
-            if (x + largestShipSize > 9 || x - largestShipSize < 0) {
-                thereIsRoom = false;
-            } else {
-                for (int i = x; i <= x + largestShipSize && thereIsRoom; i++) {
-                    thereIsRoom = thereIsRoom & (hitmapStat[i][y] > 0);
-                }
-            }
-        }
-        return thereIsRoom;
-    }
-
     public void hitmapCounter(int largestShipSize, int x, int y, boolean vertical) {
 
         if (vertical) {
-            for (int i = y; i <= y + largestShipSize; i++) {
-                hitmapStat[x][i] += 1;
+            for (int i = 0; i < largestShipSize; i++) {
+                hitmapStat[x][y + i] += 1;
             }
         } else {
-            for (int i = x; i <= x + largestShipSize; i++) {
-                hitmapStat[i][y] += 1;
+            for (int i = 0; i < largestShipSize; i++) {
+                hitmapStat[x + i][y] += 1;
             }
         }
-    }
-
-    public int[][] fillParityArray() {
-        //Udfylder map med 0 og 1 tal
-        for (int y = 0; y < sizeY; y++) {
-            for (int x = sizeX - 1; x >= 0; x--) {
-                if (y % 2 == 0 && x % 2 > 0 || x % 2 == 0 && y % 2 > 0) {
-                    parityMap[x][y] = 0; // nummer for hvert felt
-                } else {
-                    parityMap[x][y] = 1;
-                }
-            }
-        }
-        return parityMap;
     }
 
     public void fillHitmap() {
